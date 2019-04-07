@@ -1,2 +1,2 @@
-fedit: fedit.c terminalmode.c errorhandling.c
-	$(CC) fedit.c terminalmode.c errorhandling.c -o fedit -Wall -Wextra -pedantic
+fedit: src/fedit.c src/terminalmode.c src/errorhandling.c
+	$(CC) src/fedit.c src/terminalmode.c src/errorhandling.c -o fedit -Wall -Wextra -pedantic
