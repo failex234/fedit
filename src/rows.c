@@ -23,10 +23,11 @@ void appendRow(char *s, size_t len) {
 	E.numrows++;
 }
 
-//Replaces characters with more visual appealing characters
+//Replaces Tabs with 8 spaces to prevent "ghosting" of characters
 void updateRow(erow *row) {
 	int tabs = 0;
 	
+	//Count the number of tabs
 	for (int i = 0; i < row->size; i++) {
 		if (row->chars[i] == '\t') {
 			tabs++;
@@ -36,6 +37,7 @@ void updateRow(erow *row) {
 	free(row->render);
 	row->render = malloc(row->size + tabs * (FEDIT_TAB_STOP - 1) + 1);
 	
+	//Replace tabs with 8 spaces
 	int idx = 0;
 	for (int i = 0; i < row->size; i++) {
 		if (row->chars[i] == '\t') {
@@ -49,7 +51,10 @@ void updateRow(erow *row) {
 		}
 	}
 	
+	//null terminate string
 	row->render[idx] = '\0';
+	
+	//set the render size
 	row->rsize = idx;
 }
 

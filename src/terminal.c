@@ -12,6 +12,8 @@ void refreshScreen() {
 	abAppend(&ab, "\x1b[H", 3);
 	
 	drawRows(&ab);
+	drawStatusBar(&ab);
+	drawMessageBar(&ab);
 	
 	//Place the cursor to the position from the config
 	char buf[32];
@@ -69,9 +71,7 @@ void drawRows(struct abuf *ab) {
 		//Clear current line (Erase In Line)
 		abAppend(ab, "\x1b[K", 3);
 		//Write a carriage-return and a newline in every line except for the last one
-		if (i < E.screenrows - 1) {
-			abAppend(ab, "\r\n", 2);
-		}
+		abAppend(ab, "\r\n", 2);
 	}
 }
 
@@ -154,5 +154,45 @@ void scroll() {
 	//When cursor goes offscreen to the right
 	if (E.rx >= E.coloff + E.screencols) {
 		E.coloff = E.rx - E.screencols + 1;
+	}
+}
+
+void drawStatusBar(struct abuf *ab) {
+	//Invert colors (Select Graphic Rendition)
+	abAppend(ab, "\x1b[7m", 4);
+	char status[80], rstatus[80];
+	int len = snprintf(status, sizeof(status), "%.20s - %d lines", E.filename ? E.filename : "[No Name", E.numrows);
+	int rlen = snprintf(rstatus, sizeof(rstatus). "%d/%d", E.cy + 1, E.numrows);
+	
+	if (len > E.screencols) {
+		len = E.screencols;
+	}
+	
+	abAppend(ab, status, len);
+	
+	while (len < E.screencols) {
+		if (E.screencols - len == rlen) {
+			abAppend(ab, rstatus, rlen);
+			break;
+		} else {
+			abAppend(ab, " ", 1);
+			len++;
+		}
+	}
+	//Clear all attributes (Select Graphic Rendition)
+	abAppend(ab, "\x1b[m", 3);
+	abAppend(ab, "\r\n", 2);
+}
+
+void drawMessageBar(struct abuf *ab) {
+	abAppend(ab, "\x1b[K", 3);
+	
+	int msglen = strlen(E.statusmsg);
+	
+	if (msglen > E.screencols) {
+		msglen = E.screencols;
+	}
+	if (msglen && time(NULL) - E.statusmsg_time < 5) {
+		abAppend(ab, E.statusmsg, msglen);
 	}
 }

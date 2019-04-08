@@ -1,5 +1,8 @@
 #include "fedit.h"
 void file_open(char *filename) {
+	free(E.filename);
+	E.filename = strdup(filename);
+	
 	FILE *fp = fopen(filename, "r");
 	
 	//Kill program when file doesn't exist

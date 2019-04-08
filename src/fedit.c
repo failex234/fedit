@@ -6,6 +6,8 @@ int main(int argc, char **argv) {
 	if (argc >= 2) {
 		file_open(argv[1]);
 	}
+	
+	setStatusMessage("HELP: Ctrl+Q = quit");
 
 	while (1) {
 		refreshScreen();
@@ -15,6 +17,7 @@ int main(int argc, char **argv) {
 }
 
 void init() {
+	//Set initial values
 	E.cx = 0;
 	E.cy = 0;
 	E.rx = 0;
@@ -22,9 +25,15 @@ void init() {
 	E.coloff = 0;
 	E.numrows = 0;
 	E.row = NULL;
+	E.filename = NULL;
+	E.statusmsg[0] = '\0';
+	E.statusmsg_time = 0;
+	
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
 		die("getWindowSize");
 	}
+	
+	E.screenrows -= 2;
 }
 
 void moveCursor(int key) {
@@ -64,4 +73,15 @@ void moveCursor(int key) {
 	if (E.cx > rowlen) {
 		E.cx = rowlen;
 	}
+}
+
+void setStatusMessage(const char *format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	
+	vsnprintf(E.statusmsg, sizeof(E.statusmsg, format, ap);
+	
+	va_end(ap);
+	
+	E.statusmsg_time = time(NULL);
 }

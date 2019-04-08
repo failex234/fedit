@@ -5,11 +5,13 @@
 #define _BSD_SOURCE
 #define _GNU_SOURCE
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 #include <errno.h>
 #include <termios.h>
 #include <sys/ioctl.h>
@@ -39,6 +41,9 @@ struct editorConfig {
 	int screencols;
 	int numrows;
 	erow *row;
+	char *filename;
+	char statusmsg[80];
+	time_t statusmsg_time;
 	struct termios orig_termios;
 };
 
@@ -68,6 +73,8 @@ char welcome[80];
 //Prototypes for fedit.c
 void init();
 void moveCursor(int);
+void processKeyPress();
+void setStatusMessage(const char *, ...);
 
 //Prototypes for terminalmode.c
 void enableRawMode();
@@ -84,6 +91,8 @@ void processKeyPress();
 void refreshScreen();
 void drawRows();
 void scroll();
+void drawStatusBar(struct abuf *);
+void drawMessageBar(struct abuf *);
 int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);
 
