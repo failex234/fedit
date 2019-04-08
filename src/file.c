@@ -24,6 +24,7 @@ void file_open(char *filename) {
 	}
 	free(line);
 	fclose(fp);
+	E.modified = 0;
 }
 
 char *rows_to_string(int *buflen) {
@@ -50,6 +51,7 @@ char *rows_to_string(int *buflen) {
 }
 
 void file_save() {
+	//Check if a file is opened
 	if (E.filename == NULL) {
 		return;
 	}
@@ -58,10 +60,19 @@ void file_save() {
 	char *buf = rows_to_string(&len);
 	
 	int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
-	ftruncate(fd, len);
-	
-	write(fd, buf, len);
-	close(fd);
-	
+	if (fd != -1) {
+		if (ftruncate(fd, len) != -1) {
+			if (write(fd, buf, len) == len) {
+				close(fd);
+				free(buf);
+
+				E.modified = 0;
+				setStatusMessage("%d bytes written to disk!", len);
+				return;
+			}
+		}
+		close(fd);
+	}
 	free(buf);
+	setStatusMessage("Error while trying to save: %s", strerror(errno));
 }

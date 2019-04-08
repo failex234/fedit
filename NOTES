@@ -1,0 +1,2 @@
+- Add timeout parameter to setStatusMessage() to define a custom timeout (or a new function)
+- Create temp file when saving then later overwrite wanted file

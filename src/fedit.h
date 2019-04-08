@@ -23,6 +23,7 @@
 
 #define FEDIT_VERSION "0.0.1"
 #define FEDIT_TAB_STOP 8
+#define FEDIT_QUIT_TIMES 2
 
 //Editor row
 typedef struct erow {
@@ -42,6 +43,7 @@ struct editorConfig {
 	int screencols;
 	int numrows;
 	erow *row;
+	int modified;
 	char *filename;
 	char statusmsg[80];
 	time_t statusmsg_time;
@@ -113,6 +115,8 @@ int rowCxToRx(erow *row, int cx);
 
 //Prototypes for editor.c
 void rowInsertChar(erow *, int, int);
+void rowDeleteChar(erow *, int);
+void deleteChar();
 void insertChar(int);
 
 #endif

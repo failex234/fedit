@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
 		file_open(argv[1]);
 	}
 	
-	setStatusMessage("HELP: Ctrl+Q = quit");
+	setStatusMessage("HELP: Ctrl+S = save | Ctrl+Q = quit");
 
 	while (1) {
 		refreshScreen();
@@ -25,6 +25,7 @@ void init() {
 	E.coloff = 0;
 	E.numrows = 0;
 	E.row = NULL;
+	E.modified = 0;
 	E.filename = NULL;
 	E.statusmsg[0] = '\0';
 	E.statusmsg_time = 0;

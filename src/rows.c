@@ -21,6 +21,7 @@ void appendRow(char *s, size_t len) {
 	updateRow(&E.row[at]);
 	
 	E.numrows++;
+	E.modified++;
 }
 
 //Replaces Tabs with 8 spaces to prevent "ghosting" of characters

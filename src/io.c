@@ -60,7 +60,10 @@ int readKey() {
 	return c;
 }
 
+//Does stuff when certain keys are pressed
 void processKeyPress() {
+	static int quit_times = FEDIT_QUIT_TIMES;
+
 	int c = readKey();
 	
 	switch(c) {
@@ -68,11 +71,19 @@ void processKeyPress() {
 		
 			break;
 		case CTRL_KEY('q'):
+			if (E.modified && quit_times > 0) {
+				setStatusMessage("Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.", quit_times, quit_times > 1 ? "s" : "");
+				quit_times--;
+				return;
+			}
 			//Erase screen
 			write(STDOUT_FILENO, "\x1b[2J", 4);
 			//Place cursor to default (1,1) position
 			write(STDOUT_FILENO, "\x1b[H", 3);
 			exit(0);
+			break;
+		case CTRL_KEY('s'):
+			file_save();
 			break;
 		case HOME_KEY:
 			E.cx = 0;
@@ -86,6 +97,10 @@ void processKeyPress() {
 		case BACKSPACE:
 		case CTRL_KEY('h'):
 		case DEL_KEY:
+			if (c == DEL_KEY) {
+				moveCursor(ARROW_RIGHT);
+			}
+			deleteChar();
 			break;
 		case PAGE_UP:
 		case PAGE_DOWN:
@@ -119,4 +134,5 @@ void processKeyPress() {
 			insertChar(c);
 			break;
 	}
+	quit_times = FEDIT_QUIT_TIMES;
 }
