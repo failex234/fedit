@@ -122,5 +122,6 @@ void deleteRow(int);
 void deleteChar();
 void insertChar(int);
 void insertNewLine();
+char *prompt(char *);
 
 #endif

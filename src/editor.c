@@ -46,3 +46,40 @@ void insertNewLine() {
 	E.cy++;
 	E.cx = 0;
 }
+
+char *prompt(char *string) {
+	size_t bufsize = 128;
+	char *buf = malloc(bufsize);
+
+	size_t buflen = 0;
+	buf[0] = '\0';
+
+	while(1) {
+		setStatusMessage(string, buf);
+		refreshScreen();
+
+		int c = readKey();
+		if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
+			if (buflen != 0) {
+				buf[--buflen] == '\0';
+			}
+		} else if (c == '\x1b') { 
+			setStatusMessage("");
+			free(buf);
+
+			return NULL;
+		} else if (c == '\r') {
+			if (buflen != 0) {
+				setStatusMessage("");
+				return buf;
+			}
+		} else if (!iscntrl(c) && c < 128) {
+			if (buflen == bufsize - 1) {
+				bufsize *= 2;
+				buf = realloc(buf, bufsize);
+			}
+			buf[buflen++] = c;
+			buf[buflen] = '\0';
+		}
+	}
+}

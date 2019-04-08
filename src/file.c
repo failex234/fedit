@@ -53,7 +53,13 @@ char *rows_to_string(int *buflen) {
 void file_save() {
 	//Check if a file is opened
 	if (E.filename == NULL) {
-		return;
+		E.filename = prompt("Save as: %s");
+
+		//User aborted file naming process by pressing ESC
+		if (E.filename == NULL) {
+			setStatusMessage("Save aborted!");
+			return;
+		}
 	}
 	
 	int len;
