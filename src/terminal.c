@@ -65,7 +65,38 @@ void drawRows(struct abuf *ab) {
 			int len = E.row[filerow].rsize - E.coloff;
 			if (len < 0) len = 0;
 			if (len > E.screencols) len = E.screencols;
-			abAppend(ab, &E.row[filerow].render[E.coloff], len);
+
+			//Character of the line
+			char *c = &E.row[filerow].render[E.coloff];
+
+			//The characters' corresponding highlight
+			unsigned char *hl = &E.row[filerow].hl[E.coloff];
+
+			int current_color = -1;
+
+			//Get the color of each highlight and print
+			//the corresponding escape sequence with it
+      		for (int i = 0; i < len; i++) {
+				if (hl[i] == HL_NORMAL) {
+					if (current_color != -1) {
+          				abAppend(ab, "\x1b[39m", 5);
+						current_color = -1;
+					}
+          			abAppend(ab, &c[i], 1);
+        		} else {
+          			int color = syntaxToColor(hl[i]);
+					if (color != current_color) {
+						current_color = color;
+          				char buf[16];
+
+						//Input color code into escape sequence
+          				int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
+          				abAppend(ab, buf, clen);
+					}
+          			abAppend(ab, &c[i], 1);
+        		}
+      		}
+			abAppend(ab, "\x1b[39m", 5);
 		}
 		
 		//Clear current line (Erase In Line)

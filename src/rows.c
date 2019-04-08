@@ -19,6 +19,7 @@ void insertRow(int at, char *s, size_t len) {
 	
 	E.row[at].rsize = 0;
 	E.row[at].render = NULL;
+	E.row[at].hl = NULL;
 	updateRow(&E.row[at]);
 	
 	E.numrows++;
@@ -59,6 +60,8 @@ void updateRow(erow *row) {
 	
 	//set the render size
 	row->rsize = idx;
+
+	updateSyntax(row);
 }
 
 int rowCxToRx(erow *row, int cx) {
@@ -139,6 +142,7 @@ void rowAppendString(erow *row, char *string, size_t len) {
 void freeRow(erow *row) {
 	free(row->render);
 	free(row->chars);
+	free(row->hl);
 }
 
 void deleteRow(int at) {

@@ -31,6 +31,7 @@ typedef struct erow {
 	int rsize;
 	char *chars;
 	char *render;
+	unsigned char *hl;
 } erow;
 
 struct editorConfig {
@@ -70,6 +71,11 @@ enum editorKey {
 	PAGE_UP,
 	PAGE_DOWN,
 	
+};
+
+enum editorHighlight {
+	HL_NORMAL = 0,
+	HL_NUMBER
 };
 
 char welcome[80];
@@ -126,5 +132,9 @@ void insertNewLine();
 char *prompt(char *string, void (*callback)(char *, int));
 void find();
 void findCallback(char *, int);
+
+//Prototypes for highlight.c
+void updateSyntax(erow *);
+int syntaxToColor(int);
 
 #endif
