@@ -14,10 +14,16 @@ void updateSyntax(erow *row) {
     char **keywords = E.syntax->keywords;
 
     char *scs = E.syntax->singleline_comment_start;
+    char *mcs = E.syntax->multiline_comment_start;
+    char *mce = E.syntax->multiline_comment_end;
+
     int scs_len = scs ? strlen(scs) : 0;
+    int mcs_len = mcs ? strlen(mcs) : 0;
+    int mce_len = mce ? strlen(mce) : 0;
 
     int prev_sep = 1;
     int in_string = 0;
+    int in_comment = (row->idx > 0 && E.row[row->idx - 1].hl_open_comment);
     
     //Check every character
     int i = 0;
@@ -26,10 +32,35 @@ void updateSyntax(erow *row) {
         unsigned char prev_hl = (i > 0) ? row->hl[i - 1] : HL_NORMAL;
 
         //Handle comments
-        if (scs_len && !in_string) {
+        if (scs_len && !in_string && !in_comment) {
             if (!strncmp(&row->render[i], scs, scs_len)) {
                 memset(&row->hl[i], HL_COMMENT, row->rsize);
                 break;
+            }
+        }
+
+        //Handle multiline comments
+        if (mcs_len && mce_len && !in_string) {
+            if (in_comment) {
+                row->hl[i] = HL_MLCOMMENT;
+
+                if (!strncmp(&row->render[i], mce, mce_len)) {
+                    memset(&row->hl[i], HL_MLCOMMENT, mce_len);
+
+                    i += mce_len;
+                    in_comment = 0;
+                    prev_sep = 1;
+
+                    continue;
+                } else {
+                    i++;
+                    continue;
+                }
+            } else if (!strncmp(&row->render[i], mcs, mcs_len)) {
+                memset(&row->hl[i], HL_MLCOMMENT, mcs_len);
+                i += mcs_len;
+                in_comment = 1;
+                continue;
             }
         }
 
@@ -96,6 +127,13 @@ void updateSyntax(erow *row) {
         prev_sep = isSeperator(c);
         i++;
     }
+
+    int changed = (row->hl_open_comment != in_comment);
+    row->hl_open_comment = in_comment;
+
+    if (changed && row->idx + 1 < E.numrows) {
+        updateSyntax(&E.row[row->idx + 1]);
+    }
 }
 
 int syntaxToColor(int hl) {
@@ -110,6 +148,7 @@ int syntaxToColor(int hl) {
             return 34;
         case HL_STRING:
             return 35;
+        case HL_MLCOMMENT:
         case HL_COMMENT:
             return 36;
         default:

@@ -6,6 +6,12 @@ void insertRow(int at, char *s, size_t len) {
 
 	E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
 	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
+
+	for (int i = at + 1; i <= E.numrows; i++) {
+		E.row[i].idx++;
+	}
+
+	E.row[at].idx = at;
 	
 	//Set the length and allocate space for the string that should be appended
 	E.row[at].size = len;
@@ -20,6 +26,7 @@ void insertRow(int at, char *s, size_t len) {
 	E.row[at].rsize = 0;
 	E.row[at].render = NULL;
 	E.row[at].hl = NULL;
+	E.row[at].hl_open_comment = 0;
 	updateRow(&E.row[at]);
 	
 	E.numrows++;
@@ -153,6 +160,10 @@ void deleteRow(int at) {
 	//Free the space of the row
 	freeRow(&E.row[at]);
 	memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
+
+	for (int i = at; i < E.numrows - 1; i++) {
+		E.row[i].idx--;
+	}
 
 	E.numrows--;
 	E.modified++;
