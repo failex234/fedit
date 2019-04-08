@@ -29,6 +29,7 @@ typedef struct erow {
 struct editorConfig {
 	//Cursor position
 	int cx, cy;
+	int rowoff;
 	int screenrows;
 	int screencols;
 	int numrows;
@@ -77,6 +78,7 @@ void processKeyPress();
 //Prototypes for terminal.c
 void refreshScreen();
 void drawRows();
+void scroll();
 int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);
 

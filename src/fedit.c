@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
 void init() {
 	E.cx = 0;
 	E.cy = 0;
+	E.rowoff = 0;
 	E.numrows = 0;
 	E.row = NULL;
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
@@ -42,7 +43,7 @@ void moveCursor(int key) {
 			}
 			break;
 		case ARROW_DOWN:
-			if (E.cx != E.screenrows - 1) {
+			if (E.cy < E.numrows) {
 				E.cy++;
 			}
 			break;

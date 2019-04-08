@@ -1,7 +1,7 @@
 #include "fedit.h"
 void appendRow(char *s, size_t len) {
 	//Reallocate space for the current number of rows + a new row
-	E.row = realloc(E.row, sizeof(erow), * (E.numrows + 1));
+	E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
 	
 	//Determine the last index
 	int at = E.numrows;

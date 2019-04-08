@@ -2,6 +2,8 @@
 
 //Clear the screen, draw the rows and position the cursor at the top-left
 void refreshScreen() {
+	scroll();
+	
 	struct abuf ab = ABUF_INIT;
 	
 	//Hide the cursor so no "flickering" can occur (Set Mode)
@@ -27,7 +29,8 @@ void refreshScreen() {
 void drawRows(struct abuf *ab) {
 	//Place a tilde at the beginning of every line
 	for (int i = 0; i < E.screenrows; i++) {
-		if (i >= E.numrows) {
+		int filerow = i + E.rowoff;
+		if (filerow >= E.numrows) {
 			//Display welcome message
 			if (E.numrows == 0 && i == E.screenrows / 2) {
 				int welcomelen = snprintf(welcome, sizeof(welcome),
@@ -57,9 +60,9 @@ void drawRows(struct abuf *ab) {
 				abAppend(ab, "~", 1);
 			}
 		} else {
-			int len = E.row[i].size;
+			int len = E.row[filerow].size;
 			if (len > E.screencols) len = E.screencols;
-			abAppend(ab, E.row[i].chars, len);
+			abAppend(ab, E.row[filerow].chars, len);
 		}
 		
 		//Clear current line (Erase In Line)
@@ -123,4 +126,13 @@ int getCursorPosition(int *rows, int *cols) {
 	}
 	
 	return 0;
+}
+
+void scroll() {
+	if (E.cy < E.rowoff) {
+		E.rowoff = E.cy;
+	}
+	if (E.cy >= E.rowoff + E.screenrows) {
+		E.rowoff = E.cy - E.screenrows + 1;
+	}
 }
