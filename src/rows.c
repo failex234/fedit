@@ -24,6 +24,7 @@ void appendRow(char *s, size_t len) {
 }
 
 //Replaces Tabs with 8 spaces to prevent "ghosting" of characters
+//And also update the current row
 void updateRow(erow *row) {
 	int tabs = 0;
 	

@@ -25,3 +25,43 @@ void file_open(char *filename) {
 	free(line);
 	fclose(fp);
 }
+
+char *rows_to_string(int *buflen) {
+	int totlen = 0;
+	
+	for (int i = 0; i < E.numrows; i++) {
+		totlen += E.row[i].size + 1;
+	}
+	
+	*buflen = totlen;
+	
+	char *buf = malloc(totlen);
+	char *p = buf;
+	
+	for (int i = 0; i < E.numrows; i++) {
+		memcpy(p, E.row[i].chars, E.row[i].size);
+		p += E.row[i].size;
+		
+		*p = '\n';
+		p++;
+	}
+	
+	return buf;
+}
+
+void file_save() {
+	if (E.filename == NULL) {
+		return;
+	}
+	
+	int len;
+	char *buf = rows_to_string(&len);
+	
+	int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
+	ftruncate(fd, len);
+	
+	write(fd, buf, len);
+	close(fd);
+	
+	free(buf);
+}

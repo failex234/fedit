@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
@@ -56,6 +57,7 @@ struct abuf {
 struct editorConfig E;
 
 enum editorKey {
+	BACKSPACE = 127,
 	ARROW_LEFT 	= 1000,
 	ARROW_RIGHT,
 	ARROW_UP,
@@ -73,7 +75,6 @@ char welcome[80];
 //Prototypes for fedit.c
 void init();
 void moveCursor(int);
-void processKeyPress();
 void setStatusMessage(const char *, ...);
 
 //Prototypes for terminalmode.c
@@ -101,7 +102,9 @@ void abAppend(struct abuf *, const char *, int);
 void abFree(struct abuf *);
 
 //Prototypes for file.c
-void file_open();
+void file_open(char *filename);
+void file_save();
+char *rows_to_string(int *);
 
 //Prototypes for rows.c
 void appendRow(char *, size_t);
@@ -110,5 +113,6 @@ int rowCxToRx(erow *row, int cx);
 
 //Prototypes for editor.c
 void rowInsertChar(erow *, int, int);
+void insertChar(int);
 
 #endif

@@ -64,6 +64,9 @@ void processKeyPress() {
 	int c = readKey();
 	
 	switch(c) {
+		case '\r':
+		
+			break;
 		case CTRL_KEY('q'):
 			//Erase screen
 			write(STDOUT_FILENO, "\x1b[2J", 4);
@@ -79,6 +82,10 @@ void processKeyPress() {
 			if (E.cy < E.numrows) {
 				E.cx = E.row[E.cy].size;
 			}
+			break;
+		case BACKSPACE:
+		case CTRL_KEY('h'):
+		case DEL_KEY:
 			break;
 		case PAGE_UP:
 		case PAGE_DOWN:
@@ -104,6 +111,12 @@ void processKeyPress() {
 		case ARROW_LEFT:
 		case ARROW_RIGHT:
 			moveCursor(c);
+			break;
+		case CTRL_KEY('l'):
+		case '\x1b':
+			break;
+		default:
+			insertChar(c);
 			break;
 	}
 }
