@@ -4,19 +4,21 @@
 void refreshScreen() {
 	struct abuf ab = ABUF_INIT;
 	
-	//Hide the cursor so no "flickering" can occur
+	//Hide the cursor so no "flickering" can occur (Set Mode)
 	abAppend(&ab, "\x1b[?25l", 6);
-	
-	//Erase display
-	abAppend(&ab, "\x1b[2J", 4);
-	//Place cursor to default (1,1) position
+	//Place cursor to default (1,1) position (Cursor Position)
 	abAppend(&ab, "\x1b[H", 3);
 	
 	drawRows(&ab);
 	
-	//Place cursor to default (1,1) position
+	//Place the cursor to the position from the config
+	char buf[32];
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+	abAppend(&ab, buf, strlen(buf));
+	
+	//Place cursor to default (1,1) position (Cursor Position)
 	abAppend(&ab, "\x1b[H", 3);
-	//Show the cursor again
+	//Show the cursor again (Reset Mode)
 	abAppend(&ab, "\x1b[?25h", 6);
 	
 	//Write the buffer to the screen
@@ -27,8 +29,37 @@ void refreshScreen() {
 void drawRows(struct abuf *ab) {
 	//Place a tilde at the beginning of every line
 	for (int i = 0; i < E.screenrows; i++) {
-		abAppend(ab, "~", 1);
+		//Display welcome message
+		if (i == E.screenrows / 3) {
+			int welcomelen = snprintf(welcome, sizeof(welcome),
+				"FEdit -- version %s", FEDIT_VERSION);
+				
+			//Truncate the welcome message if longer than the number of columns
+			if (welcomelen > E.screencols) {
+				welcomelen = E.screencols;
+			}
+			
+			//Calculate padding to center the welcome message
+			int padding = (E.screencols - welcomelen) / 2;
+			if (padding) {
+				apAppend(ab, "~", 1);
+				padding--;
+			}
+			
+			//Add padding to the left side
+			while (padding--) {
+				abAppend(ab, " ", 1);
+			}
+			
+			//Display welcome message
+			abAppend(ab, welcome, welcomelen);
+		} else {
+			//Draw tilde in line
+			abAppend(ab, "~", 1);
+		}
 		
+		//Clear current line (Erase In Line)
+		abAppend(ab, "\x1b[K", 3);
 		//Write a carriage-return and a newline in every line except for the last one
 		if (i < E.screenrows - 1) {
 			abAppend(ab, "\r\n", 2);
@@ -60,7 +91,7 @@ int getCursorPosition(int *rows, int *cols) {
 	char buf[32];
 	unsigned int i = 0;
 	
-	//"Send" out the escape sequence for cursor position report
+	//"Send" out the escape sequence for cursor position report (Device Status Report)
 	if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) return -1;
 	
 	//Read in the response escape sequence char by char

@@ -12,7 +12,11 @@
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define ABUF_INIT {NULL, 0}
 
+#define FEDIT_VERSION "0.0.1"
+
 struct editorConfig {
+	//Cursor position
+	int cx, cy;
 	int screenrows;
 	int screencols;
 	struct termios orig_termios;
@@ -24,6 +28,19 @@ struct abuf {
 };
 
 struct editorConfig E;
+
+enum editorKey {
+	ARROW_LEFT 	= 'h',
+	ARROW_RIGHT = 'l',
+	ARROW_UP	= 'k',
+	ARROW_DOWN	= 'j'
+	
+};
+
+char welcome[80];
+
+//Prototypes for fedit.c
+void moveCursor(char);
 
 //Prototypes for terminalmode.c
 void enableRawMode();
