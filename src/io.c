@@ -30,8 +30,13 @@ int readKey() {
 				
 				if (seq[2] == '~') {
 					switch(seq[1]) {
+						case '1': return HOME_KEY;
+						case '3': return DEL_KEY;
+						case '4': return END_KEY;
 						case '5': return PAGE_UP;
 						case '6': return PAGE_DOWN;
+						case '7': return HOME_KEY;
+						case '8': return END_KEY;
 					}
 				}
 			} else {
@@ -40,7 +45,14 @@ int readKey() {
 					case 'B': return ARROW_DOWN;
 					case 'C': return ARROW_RIGHT;
 					case 'D': return ARROW_LEFT;
+					case 'H': return HOME_KEY;
+					case 'F': return END_KEY;
 				}
+			}
+		} else if (seq[0] == 'O') {
+			switch(seq[1]) {
+				case 'H': return HOME_KEY;
+				case 'F': return END_KEY;
 			}
 		}
 		return '\x1b'; 
@@ -58,6 +70,12 @@ void processKeyPress() {
 			//Place cursor to default (1,1) position
 			write(STDOUT_FILENO, "\x1b[H", 3);
 			exit(0);
+			break;
+		case HOME_KEY:
+			E.cx = 0;
+			break;
+		case END_KEY:
+			E.cx = E.screencols - 1;
 			break;
 		case PAGE_UP:
 		case PAGE_DOWN:
