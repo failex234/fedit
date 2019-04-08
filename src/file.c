@@ -12,7 +12,7 @@ void file_open(char *filename) {
 	ssize_t linelen;
 	
 	//Read line and cut off carriage-return or newline
-	while ((linelen = linelen = getline(&line, &linecap, fp)) != -1) {
+	while ((linelen = getline(&line, &linecap, fp)) != -1) {
 		while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r')) {
 			linelen--;
 		}
