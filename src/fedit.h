@@ -84,7 +84,7 @@ int getCursorPosition(int *, int *);
 void abAppend(struct abuf *, const char *, int);
 void abFree(struct abuf *);
 
-//Prototypes for file.char
+//Prototypes for file.c
 void file_open();
 
 //Prototypes for rows.c
