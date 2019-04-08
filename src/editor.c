@@ -61,7 +61,7 @@ char *prompt(char *string) {
 		int c = readKey();
 		if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
 			if (buflen != 0) {
-				buf[--buflen] == '\0';
+				buf[--buflen] = '\0';
 			}
 		} else if (c == '\x1b') { 
 			setStatusMessage("");
