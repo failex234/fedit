@@ -48,6 +48,7 @@ void insertNewLine() {
 }
 
 char *prompt(char *string) {
+	//Allocate space for the user-entered text
 	size_t bufsize = 128;
 	char *buf = malloc(bufsize);
 
@@ -55,31 +56,58 @@ char *prompt(char *string) {
 	buf[0] = '\0';
 
 	while(1) {
+		//Set the status message to the given format string and the user-entered text
 		setStatusMessage(string, buf);
 		refreshScreen();
 
 		int c = readKey();
+		//Remove the last character
 		if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
 			if (buflen != 0) {
 				buf[--buflen] = '\0';
 			}
+		//Abort prompt when hitting the escape key
 		} else if (c == '\x1b') { 
 			setStatusMessage("");
 			free(buf);
 
 			return NULL;
+		//Confirm the entered text when hitting return
 		} else if (c == '\r') {
 			if (buflen != 0) {
 				setStatusMessage("");
 				return buf;
 			}
+		//Make sure, that we only deal with "displayable" characters
 		} else if (!iscntrl(c) && c < 128) {
+			//Resize buffer and add new character to the buffer
 			if (buflen == bufsize - 1) {
 				bufsize *= 2;
 				buf = realloc(buf, bufsize);
 			}
 			buf[buflen++] = c;
 			buf[buflen] = '\0';
+		}
+	}
+}
+
+void find() {
+	char *query = prompt("(ESC to cancel) Find: %s");
+	if (query == NULL) {
+		return;
+	}
+
+	for (int i = 0; i < E.numrows; i++) {
+		erow *row = &E.row[i];
+
+		char *match = strstr(row->render, query);
+
+		if (match) {
+			E.cy = i;
+			E.cx = rowRxToCx(row, match - row->render);
+			E.rowoff = E.numrows;
+
+			break;
 		}
 	}
 }

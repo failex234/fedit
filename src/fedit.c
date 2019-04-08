@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
 		file_open(argv[1]);
 	}
 	
-	setStatusMessage("HELP: Ctrl+S = save | Ctrl+Q = quit");
+	setStatusMessage("HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
 
 	while (1) {
 		refreshScreen();

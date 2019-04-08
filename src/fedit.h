@@ -115,6 +115,7 @@ void rowInsertChar(erow *, int, int);
 void rowDeleteChar(erow *, int);
 void rowAppendString(erow *, char *, size_t);
 int rowCxToRx(erow *, int);
+int rowRxToCx(erow *, int);
 void freeRow(erow *);
 void deleteRow(int);
 
@@ -123,5 +124,6 @@ void deleteChar();
 void insertChar(int);
 void insertNewLine();
 char *prompt(char *);
+void find();
 
 #endif

@@ -85,6 +85,9 @@ void processKeyPress() {
 		case CTRL_KEY('s'):
 			file_save();
 			break;
+		case CTRL_KEY('f'):
+			find();
+			break;
 		case HOME_KEY:
 			E.cx = 0;
 			break;
