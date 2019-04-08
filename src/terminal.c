@@ -16,8 +16,6 @@ void refreshScreen() {
 	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
 	abAppend(&ab, buf, strlen(buf));
 	
-	//Place cursor to default (1,1) position (Cursor Position)
-	abAppend(&ab, "\x1b[H", 3);
 	//Show the cursor again (Reset Mode)
 	abAppend(&ab, "\x1b[?25h", 6);
 	
