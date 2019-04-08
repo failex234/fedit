@@ -104,19 +104,23 @@ void abAppend(struct abuf *, const char *, int);
 void abFree(struct abuf *);
 
 //Prototypes for file.c
-void file_open(char *filename);
+void file_open(char *);
 void file_save();
 char *rows_to_string(int *);
 
 //Prototypes for rows.c
-void appendRow(char *, size_t);
+void insertRow(int, char *, size_t);
 void updateRow(erow *row);
-int rowCxToRx(erow *row, int cx);
-
-//Prototypes for editor.c
 void rowInsertChar(erow *, int, int);
 void rowDeleteChar(erow *, int);
+void rowAppendString(erow *, char *, size_t);
+int rowCxToRx(erow *, int);
+void freeRow(erow *);
+void deleteRow(int);
+
+//Prototypes for editor.c
 void deleteChar();
 void insertChar(int);
+void insertNewLine();
 
 #endif

@@ -1,10 +1,11 @@
 #include "fedit.h"
-void appendRow(char *s, size_t len) {
-	//Reallocate space for the current number of rows + a new row
+void insertRow(int at, char *s, size_t len) {
+	if (at < 0 || at > E.numrows) {
+		return;
+	}
+
 	E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
-	
-	//Determine the last index
-	int at = E.numrows;
+	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 	
 	//Set the length and allocate space for the string that should be appended
 	E.row[at].size = len;
@@ -70,4 +71,67 @@ int rowCxToRx(erow *row, int cx) {
 		rx++;
 	}
 	return rx;
+}
+
+void rowInsertChar(erow *row, int at, int c) {
+	if (at < 0 || at > row->size) {
+		at = row->size;
+	}
+	
+	//Reallocate space for the new character
+	row->chars = realloc(row->chars, row->size + 2);
+	memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+	
+	//Increase the size by 1 and then insert the character
+	row->size++;
+	row->chars[at] = c;
+	
+	updateRow(row);
+	E.modified++;
+}
+
+void rowDeleteChar(erow *row, int at) {
+	if (at < 0 || at >= row->size) {
+		return;
+	}
+
+	//Reallocate space for the deleted character
+	memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+	//Decrease size by 1
+	row->size--;
+
+	updateRow(row);
+	E.modified++;
+}
+
+void rowAppendString(erow *row, char *string, size_t len) {
+	//Reallocate space for the current row + the new string
+	row->chars = realloc(row->chars, row->size + len + 1);
+	memcpy(&row->chars[row->size], string, len);
+
+	//Add the length of the string to the row length
+	row->size += len;
+	//Add the null-terminator
+	row->chars[row->size] = '\0';
+
+	updateRow(row);
+	E.modified++;
+}
+
+void freeRow(erow *row) {
+	free(row->render);
+	free(row->chars);
+}
+
+void deleteRow(int at) {
+	if (at < 0 || at >= E.numrows) {
+		return;
+	}
+
+	//Free the space of the row
+	freeRow(&E.row[at]);
+	memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
+
+	E.numrows--;
+	E.modified++;
 }

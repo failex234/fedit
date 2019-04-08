@@ -20,7 +20,7 @@ void file_open(char *filename) {
 			linelen--;
 		}
 		//Add line to current editor rows
-		appendRow(line, linelen);
+		insertRow(E.numrows, line, linelen);
 	}
 	free(line);
 	fclose(fp);

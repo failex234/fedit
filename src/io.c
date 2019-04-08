@@ -68,7 +68,7 @@ void processKeyPress() {
 	
 	switch(c) {
 		case '\r':
-		
+			insertNewLine();
 			break;
 		case CTRL_KEY('q'):
 			if (E.modified && quit_times > 0) {
