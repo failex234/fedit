@@ -108,4 +108,7 @@ void appendRow(char *, size_t);
 void updateRow(erow *row);
 int rowCxToRx(erow *row, int cx);
 
+//Prototypes for editor.c
+void rowInsertChar(erow *, int, int);
+
 #endif
