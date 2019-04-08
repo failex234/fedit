@@ -79,7 +79,7 @@ void setStatusMessage(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	
-	vsnprintf(E.statusmsg, sizeof(E.statusmsg, format, ap);
+	vsnprintf(E.statusmsg, sizeof(E.statusmsg), format, ap);
 	
 	va_end(ap);
 	
