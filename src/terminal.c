@@ -22,7 +22,7 @@ void refreshScreen() {
 	abAppend(&ab, "\x1b[?25h", 6);
 	
 	//Write the buffer to the screen
-	write(STDOUT_FILENO, ab.b, ab.len);
+	write(STDOUT_FILENO, ab.str_buf, ab.len);
 	abFree(&ab);
 }
 
@@ -42,7 +42,7 @@ void drawRows(struct abuf *ab) {
 			//Calculate padding to center the welcome message
 			int padding = (E.screencols - welcomelen) / 2;
 			if (padding) {
-				apAppend(ab, "~", 1);
+				abAppend(ab, "~", 1);
 				padding--;
 			}
 			

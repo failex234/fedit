@@ -40,6 +40,7 @@ enum editorKey {
 char welcome[80];
 
 //Prototypes for fedit.c
+void init();
 void moveCursor(char);
 
 //Prototypes for terminalmode.c
@@ -54,7 +55,7 @@ char readKey();
 void processKeyPress();
 
 //Prototypes for terminal.c
-void clearScreen();
+void refreshScreen();
 void drawRows();
 int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);

@@ -7,7 +7,7 @@ char readKey() {
 	
 	//Read key from stdin
 	while((nread = read(STDOUT_FILENO, &c, 1)) != 1) {
-		if (nread == -1 && erno != EAGAIN) {
+		if (nread == -1 && errno != EAGAIN) {
 			die("read");
 		}
 	}
