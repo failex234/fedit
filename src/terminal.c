@@ -28,7 +28,7 @@ void drawRows(struct abuf *ab) {
 	//Place a tilde at the beginning of every line
 	for (int i = 0; i < E.screenrows; i++) {
 		//Display welcome message
-		if (i == E.screenrows / 3) {
+		if (i == E.screenrows / 2) {
 			int welcomelen = snprintf(welcome, sizeof(welcome),
 				"FEdit -- version %s", FEDIT_VERSION);
 				
