@@ -5,13 +5,13 @@ void enableRawMode() {
 
     //Get the current teminal mode and attributes and save them in the struct orig_termios
     //Also tell the library to call disableRawMode on exit (atexit)
-    if (tcgetattr(0, &orig_termios) == -1) {
+    if (tcgetattr(0, &E.orig_termios) == -1) {
         die("tcsetattr");
     }
     atexit(disableRawMode);
 
     //Create a new temporary new struct to set the new flags
-    struct termios raw = orig_termios;
+    struct termios raw = E.orig_termios;
 
     //Disable Ctrl+Q (XON) and Ctrl+S (XOFF) (Both are used for software control flow)
     //They are unneeded for today's computers
@@ -52,7 +52,7 @@ void enableRawMode() {
 //Restore the "original" terminal mode
 void disableRawMode() {
     //try restore the original mode
-    if (tcsetattr(0, TCSAFLUSH, &orig_termios) == -1) {
+    if (tcsetattr(0, TCSAFLUSH, &E.orig_termios) == -1) {
         die("tcsetattr");
     }
 }
