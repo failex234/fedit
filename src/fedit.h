@@ -1,5 +1,10 @@
 #ifndef FLX_FEDIT_H
 #define FLX_FEDIT_H
+
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,20 +13,30 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define ABUF_INIT {NULL, 0}
 
 #define FEDIT_VERSION "0.0.1"
 
+//Editor row
+typedef struct erow {
+	int size;
+	char *chars;
+} erow;
+
 struct editorConfig {
 	//Cursor position
 	int cx, cy;
 	int screenrows;
 	int screencols;
+	int numrows;
+	erow *row;
 	struct termios orig_termios;
 };
 
+//Screen buffer
 struct abuf {
 	char *str_buf;
 	int len;
@@ -69,4 +84,9 @@ int getCursorPosition(int *, int *);
 void abAppend(struct abuf *, const char *, int);
 void abFree(struct abuf *);
 
+//Prototypes for file.char
+void file_open();
+
+//Prototypes for rows.c
+void appendRow(char *, size_t);
 #endif

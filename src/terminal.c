@@ -27,33 +27,39 @@ void refreshScreen() {
 void drawRows(struct abuf *ab) {
 	//Place a tilde at the beginning of every line
 	for (int i = 0; i < E.screenrows; i++) {
-		//Display welcome message
-		if (i == E.screenrows / 2) {
-			int welcomelen = snprintf(welcome, sizeof(welcome),
-				"FEdit -- version %s", FEDIT_VERSION);
-				
-			//Truncate the welcome message if longer than the number of columns
-			if (welcomelen > E.screencols) {
-				welcomelen = E.screencols;
-			}
-			
-			//Calculate padding to center the welcome message
-			int padding = (E.screencols - welcomelen) / 2;
-			if (padding) {
-				abAppend(ab, "~", 1);
-				padding--;
-			}
-			
-			//Add padding to the left side
-			while (padding--) {
-				abAppend(ab, " ", 1);
-			}
-			
+		if (i >= E.numrows) {
 			//Display welcome message
-			abAppend(ab, welcome, welcomelen);
+			if (E.numrows == 0 && i == E.screenrows / 2) {
+				int welcomelen = snprintf(welcome, sizeof(welcome),
+					"FEdit -- version %s", FEDIT_VERSION);
+				
+				//Truncate the welcome message if longer than the number of columns
+				if (welcomelen > E.screencols) {
+					welcomelen = E.screencols;
+				}
+			
+				//Calculate padding to center the welcome message
+				int padding = (E.screencols - welcomelen) / 2;
+				if (padding) {
+					abAppend(ab, "~", 1);
+					padding--;
+				}
+			
+				//Add padding to the left side
+				while (padding--) {
+					abAppend(ab, " ", 1);
+				}
+			
+				//Display welcome message
+				abAppend(ab, welcome, welcomelen);
+			} else {
+				//Draw tilde in line
+				abAppend(ab, "~", 1);
+			}
 		} else {
-			//Draw tilde in line
-			abAppend(ab, "~", 1);
+			int len = E.row[i].size;
+			if (len > E.screencols) len = E.screencols;
+			abAppend(ab, E.row[i].chars, len);
 		}
 		
 		//Clear current line (Erase In Line)

@@ -1,8 +1,11 @@
 #include "fedit.h"
 
-int main() {
+int main(int argc, char **argv) {
 	enableRawMode();
 	init();
+	if (argc >= 2) {
+		file_open(argv[1]);
+	}
 
 	while (1) {
 		refreshScreen();
@@ -14,6 +17,8 @@ int main() {
 void init() {
 	E.cx = 0;
 	E.cy = 0;
+	E.numrows = 0;
+	E.row = NULL;
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
 		die("getWindowSize");
 	}
