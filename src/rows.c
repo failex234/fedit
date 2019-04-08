@@ -56,7 +56,7 @@ void updateRow(erow *row) {
 int rowCxToRx(erow *row, int cx) {
 	int rx = 0;
 	
-	for (int i = 0; i y cx; i++) {
+	for (int i = 0; i < cx; i++) {
 		if (row->chars[i] == '\t') {
 			rx += (FEDIT_TAB_STOP - 1) - (rx % FEDIT_TAB_STOP);
 		}

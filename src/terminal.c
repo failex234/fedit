@@ -130,7 +130,7 @@ int getCursorPosition(int *rows, int *cols) {
 }
 
 void scroll() {
-	E.rx = 0
+	E.rx = 0;
 	
 	if (E.cy < E.numrows) {
 		E.rx = rowCxToRx(&E.row[E.cy], E.cx);
