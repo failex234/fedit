@@ -123,7 +123,8 @@ void deleteRow(int);
 void deleteChar();
 void insertChar(int);
 void insertNewLine();
-char *prompt(char *);
+char *prompt(char *string, void (*callback)(char *, int));
 void find();
+void findCallback(char *, int);
 
 #endif

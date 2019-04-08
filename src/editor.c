@@ -47,7 +47,7 @@ void insertNewLine() {
 	E.cx = 0;
 }
 
-char *prompt(char *string) {
+char *prompt(char *string, void (*callback)(char *, int)) {
 	//Allocate space for the user-entered text
 	size_t bufsize = 128;
 	char *buf = malloc(bufsize);
@@ -69,6 +69,11 @@ char *prompt(char *string) {
 		//Abort prompt when hitting the escape key
 		} else if (c == '\x1b') { 
 			setStatusMessage("");
+
+			if (callback) {
+				callback(buf, c);
+			}
+
 			free(buf);
 
 			return NULL;
@@ -76,6 +81,11 @@ char *prompt(char *string) {
 		} else if (c == '\r') {
 			if (buflen != 0) {
 				setStatusMessage("");
+
+				if (callback) {
+					callback(buf, c);
+				}
+
 				return buf;
 			}
 		//Make sure, that we only deal with "displayable" characters
@@ -88,22 +98,69 @@ char *prompt(char *string) {
 			buf[buflen++] = c;
 			buf[buflen] = '\0';
 		}
+
+		if (callback) {
+			callback(buf, c);
+		}
 	}
 }
 
 void find() {
-	char *query = prompt("(ESC to cancel) Find: %s");
-	if (query == NULL) {
+	int saved_cx = E.cx;
+	int saved_cy = E.cy;
+	int saved_coloff = E.coloff;
+	int saved_rowoff = E.rowoff;
+
+	char *query = prompt("(ESC to cancel) Find: %s", findCallback);
+
+	if (query) {
+		free(query);
+	} else {
+		E.cx = saved_cx;
+		E.cy = saved_cy;
+		E.coloff = saved_coloff;
+		E.rowoff = saved_rowoff;
+	}
+}
+
+void findCallback(char *query, int key) {
+	static int last_match = -1;
+	static int direction = 1;
+
+	if (key == '\r' || key == '\x1b') {
+		last_match = -1;
+		direction = 1;
 		return;
+	} else if(key == ARROW_RIGHT || key == ARROW_DOWN) {
+		direction = 1;
+	} else if (key == ARROW_LEFT || key == ARROW_UP) {
+		direction = -1;
+	} else {
+		last_match = -1;
+		direction = 1;
 	}
 
+	if (last_match == -1) {
+		direction = 1;
+	}
+
+	int current = last_match;
+
 	for (int i = 0; i < E.numrows; i++) {
-		erow *row = &E.row[i];
+		current += direction;
+		if (current == -1) {
+			current = E.numrows - 1;
+		} else if (current == E.numrows) {
+			current = 0;
+		}
+
+		erow *row = &E.row[current];
 
 		char *match = strstr(row->render, query);
 
 		if (match) {
-			E.cy = i;
+			last_match = current;
+			E.cy = current;
 			E.cx = rowRxToCx(row, match - row->render);
 			E.rowoff = E.numrows;
 
