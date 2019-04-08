@@ -1,7 +1,7 @@
 #include "fedit.h"
 
 
-char readKey() {
+int readKey() {
 	int nread;
 	char c;
 	
@@ -38,7 +38,7 @@ char readKey() {
 }
 
 void processKeyPress() {
-	char c = readKey();
+	int c = readKey();
 	
 	switch(c) {
 		case CTRL_KEY('q'):

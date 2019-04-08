@@ -19,7 +19,7 @@ void init() {
 	}
 }
 
-void moveCursor(char key) {
+void moveCursor(int key) {
 	switch(key) {
 		case ARROW_LEFT:
 			E.cx--;

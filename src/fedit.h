@@ -30,10 +30,10 @@ struct abuf {
 struct editorConfig E;
 
 enum editorKey {
-	ARROW_LEFT 	= 'h',
-	ARROW_RIGHT = 'l',
-	ARROW_UP	= 'k',
-	ARROW_DOWN	= 'j'
+	ARROW_LEFT 	= 1000,
+	ARROW_RIGHT,
+	ARROW_UP,
+	ARROW_DOWN
 	
 };
 
@@ -41,7 +41,7 @@ char welcome[80];
 
 //Prototypes for fedit.c
 void init();
-void moveCursor(char);
+void moveCursor(int);
 
 //Prototypes for terminalmode.c
 void enableRawMode();
@@ -51,7 +51,7 @@ void disableRawMode();
 void die(const char *);
 
 //Prototypes for io.c
-char readKey();
+int readKey();
 void processKeyPress();
 
 //Prototypes for terminal.c
