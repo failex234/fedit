@@ -25,6 +25,9 @@
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
 
+#define HL_HIGHLIGHT_NUMBERS (1<<0)
+#define HL_HIGHLIGHT_STRINGS (1<<1)
+
 //Editor row
 typedef struct erow {
 	int size;
@@ -48,7 +51,16 @@ struct editorConfig {
 	char *filename;
 	char statusmsg[80];
 	time_t statusmsg_time;
+	struct editorSyntax *syntax;
 	struct termios orig_termios;
+};
+
+struct editorSyntax {
+	char *filetype;
+	char **filematch;
+	char **keywords;
+	char *singleline_comment_start;
+	int flags;
 };
 
 //Screen buffer
@@ -75,8 +87,12 @@ enum editorKey {
 
 enum editorHighlight {
 	HL_NORMAL = 0,
+	HL_STRING,
 	HL_NUMBER,
-	HL_MATCH
+	HL_MATCH,
+	HL_COMMENT,
+	HL_KEYWORD1,
+	HL_KEYWORD2
 };
 
 char welcome[80];
@@ -137,5 +153,7 @@ void findCallback(char *, int);
 //Prototypes for highlight.c
 void updateSyntax(erow *);
 int syntaxToColor(int);
+void selectSyntaxHighlight();
+int isSeperator(int);
 
 #endif

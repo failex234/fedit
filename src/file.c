@@ -2,6 +2,8 @@
 void file_open(char *filename) {
 	free(E.filename);
 	E.filename = strdup(filename);
+
+	selectSyntaxHighlight();
 	
 	FILE *fp = fopen(filename, "r");
 	
@@ -21,6 +23,7 @@ void file_open(char *filename) {
 		}
 		//Add line to current editor rows
 		insertRow(E.numrows, line, linelen);
+		updateSyntax(&E.row[E.numrows - 1]);
 	}
 	free(line);
 	fclose(fp);
@@ -60,6 +63,7 @@ void file_save() {
 			setStatusMessage("Save aborted!");
 			return;
 		}
+		selectSyntaxHighlight();
 	}
 	
 	int len;
@@ -74,6 +78,7 @@ void file_save() {
 
 				E.modified = 0;
 				setStatusMessage("%d bytes written to disk!", len);
+
 				return;
 			}
 		}
