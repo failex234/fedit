@@ -15,7 +15,7 @@ void refreshScreen() {
 	
 	//Place the cursor to the position from the config
 	char buf[32];
-	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
 	abAppend(&ab, buf, strlen(buf));
 	
 	//Show the cursor again (Reset Mode)
@@ -60,9 +60,10 @@ void drawRows(struct abuf *ab) {
 				abAppend(ab, "~", 1);
 			}
 		} else {
-			int len = E.row[filerow].size;
+			int len = E.row[filerow].rsize - E.coloff;
+			if (len < 0) len = 0;
 			if (len > E.screencols) len = E.screencols;
-			abAppend(ab, E.row[filerow].chars, len);
+			abAppend(ab, &E.row[filerow].render[E.coloff], len);
 		}
 		
 		//Clear current line (Erase In Line)
@@ -129,10 +130,29 @@ int getCursorPosition(int *rows, int *cols) {
 }
 
 void scroll() {
+	E.rx = 0
+	
+	if (E.cy < E.numrows) {
+		E.rx = rowCxToRx(&E.row[E.cy], E.cx);
+	}
+	
+	//When cursor is above the row offset
 	if (E.cy < E.rowoff) {
 		E.rowoff = E.cy;
 	}
+	
+	//When cursor goes "offscreen" down
 	if (E.cy >= E.rowoff + E.screenrows) {
 		E.rowoff = E.cy - E.screenrows + 1;
+	}
+	
+	//When cursor is left of the column offset
+	if (E.rx < E.coloff) {
+		E.coloff = E.rx;
+	}
+	
+	//When cursor goes offscreen to the right
+	if (E.rx >= E.coloff + E.screencols) {
+		E.coloff = E.rx - E.screencols + 1;
 	}
 }

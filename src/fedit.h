@@ -19,17 +19,22 @@
 #define ABUF_INIT {NULL, 0}
 
 #define FEDIT_VERSION "0.0.1"
+#define FEDIT_TAB_STOP 8
 
 //Editor row
 typedef struct erow {
 	int size;
+	int rsize;
 	char *chars;
+	char *render;
 } erow;
 
 struct editorConfig {
 	//Cursor position
 	int cx, cy;
+	int rx;
 	int rowoff;
+	int coloff;
 	int screenrows;
 	int screencols;
 	int numrows;
@@ -91,4 +96,7 @@ void file_open();
 
 //Prototypes for rows.c
 void appendRow(char *, size_t);
+void updateRow(erow *row);
+int rowCxToRx(erow *row, int cx);
+
 #endif
