@@ -15,6 +15,7 @@ void insertRow(int at, char *s, size_t len) {
 	
 	//Set the length and allocate space for the string that should be appended
 	E.row[at].size = len;
+	//malloc: memory corruption
 	E.row[at].chars = malloc(len + 1);
 	
 	//Copy the string to the correct location

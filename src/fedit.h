@@ -39,6 +39,7 @@ typedef struct erow {
 	int hl_open_comment;
 } erow;
 
+
 struct editorConfig {
 	//Cursor position
 	int cx, cy;

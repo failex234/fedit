@@ -23,7 +23,6 @@ void file_open(char *filename) {
 		}
 		//Add line to current editor rows
 		insertRow(E.numrows, line, linelen);
-		updateSyntax(&E.row[E.numrows - 1]);
 	}
 	free(line);
 	fclose(fp);
