@@ -47,8 +47,13 @@ void insertNewLine() {
 		row = &E.row[E.cy];
 		row->size = E.cx;
 		row->chars[row->size] = '\0';
+
+		updateRow(row);
 		
 		int cx_backup = E.cx;
+		int cy_backup = E.cy;
+		
+		E.cy++;
 		
 		//Indent the next line, when we typed braces
 		for (int i = 0; i < E.indentNewLine; i++) {
@@ -56,9 +61,7 @@ void insertNewLine() {
 		}
 		
 		E.cx = cx_backup;
-		
-
-		updateRow(row);
+		E.cy = cy_backup;
 	}
 	E.cy++;
 	E.cx = 0;
