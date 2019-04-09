@@ -1,10 +1,33 @@
 #include "fedit.h"
 
 int main(int argc, char **argv) {
+	int c;
+	int enableVim = 0;
+	
+	while(1) {
+		int option_index = 0;
+		
+		c = getopt_long(argc, argv, "ehv", long_options, &option_index);
+		
+		if (c == -1) break;
+		
+		switch(c) {
+			case 'e':
+				enableVim = 1;
+				break;
+			case 'v':
+				showVersion(argv[0]);
+				return 0;
+			case 'h':
+				showHelp(argv[0]);
+				return 0;
+		}
+	}
 	enableRawMode();
 	init();
-	if (argc >= 2) {
-		file_open(argv[1]);
+	
+	if (enableVim) {
+		E.vimEmulation = 1;
 	}
 	
 	setStatusMessage("HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
@@ -31,6 +54,7 @@ void init() {
 	E.statusmsg_time = 0;
 	E.syntax = NULL;
 	E.indentNewLine = 0;
+	E.vimEmulation = 0;
 	
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
 		die("getWindowSize");
@@ -87,4 +111,16 @@ void setStatusMessage(const char *format, ...) {
 	va_end(ap);
 	
 	E.statusmsg_time = time(NULL);
+}
+
+void showHelp(const char *prgname) {
+	printf("usage: %s [arguments] files...\n", prgname, FEDIT_VERSION);
+	printf("\narguments:\n");
+	printf("--vim 	 | -e\t\t\t- enable vim emulation mode\n");
+	printf("--help	 | -h\t\t\t- show help menu\n");
+	printf("--version| -v\t\t\t- show version information\n");
+}
+
+void showVersion(const char *prgname) {
+		printf("%s version %s (%s)\n", prgname, FEDIT_VERSION, FEDIT_COMPILE_DATE);
 }

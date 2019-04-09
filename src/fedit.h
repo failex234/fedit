@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <getopt.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <string.h>
@@ -22,6 +23,7 @@
 #define ABUF_INIT {NULL, 0}
 
 #define FEDIT_VERSION "0.0.1"
+#define FEDIT_COMPILE_DATE __DATE__
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
 
@@ -52,6 +54,7 @@ struct editorConfig {
 	erow *row;
 	int modified;
 	int indentNewLine;
+	int vimEmulation;
 	char *filename;
 	char statusmsg[80];
 	time_t statusmsg_time;
@@ -76,6 +79,13 @@ struct abuf {
 };
 
 struct editorConfig E;
+
+static struct option long_options[] = {
+	{"vim",		no_argument,		0, 'e'},
+	{"help",	no_argument,		0, 'h'},
+	{"version",	no_argument,		0, 'v'},
+	{0,			0,					0, 0, }	
+};
 
 enum editorKey {
 	BACKSPACE = 127,
@@ -109,6 +119,8 @@ char welcome[80];
 void init();
 void moveCursor(int);
 void setStatusMessage(const char *, ...);
+void showHelp(const char *);
+void showVersion(const char *);
 
 //Prototypes for terminalmode.c
 void enableRawMode();
