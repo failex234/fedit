@@ -65,14 +65,15 @@ void processKeyPress() {
 	static int quit_times = FEDIT_QUIT_TIMES;
 
 	int c = readKey();
-	
+
+	if (!E.vimEmulation) {
 	switch(c) {
 		case '\r':
 			insertNewLine();
 			break;
 		case CTRL_KEY('q'):
 			if (E.modified && quit_times > 0) {
-				setStatusMessage("Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.", quit_times, quit_times > 1 ? "s" : "");
+				setStatusMessage(0, "Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.", quit_times, quit_times > 1 ? "s" : "");
 				quit_times--;
 				return;
 			}
@@ -138,6 +139,52 @@ void processKeyPress() {
 			break;
 	}
 	quit_times = FEDIT_QUIT_TIMES;
+	} else {
+		switch(c) {
+			case 'i':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					setStatusMessage(-1, "--- INSERT ---");
+					VIM.mode = VIM_INSERT_MODE;
+				}
+				break;
+			case '\x1b':
+				VIM.mode = 0;
+				setStatusMessage(0, "");
+				break;
+			case ':':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					char *cmd = prompt(":%s", NULL);
+
+					if (cmd) {
+						parseCommandLine(cmd);
+					} else {
+						setStatusMessage(0, "");
+					}
+				}
+				break;
+			case BACKSPACE:
+			case CTRL_KEY('h'):
+			case DEL_KEY:
+				if (VIM.mode & VIM_INSERT_MODE) {
+					if (c == DEL_KEY) {
+						moveCursor(ARROW_RIGHT);
+					}
+					deleteChar();
+				}
+					break;
+			default:
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				}
+				break;
+		}
+	}
+
+
 }
 
 void handleSigWinch(int signal) {

@@ -30,6 +30,8 @@
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
+#define VIM_INSERT_MODE (1<<0)
+
 //Editor row
 typedef struct erow {
 	int idx;
@@ -78,7 +80,19 @@ struct abuf {
 	int len;
 };
 
+typedef struct textChange {
+	int c;
+	int changetype;
+	int x, y;
+} textChange;
+
+typedef struct vimConfig {
+	int mode;
+	textChange *allchanges;
+} vimConfig;
+
 struct editorConfig E;
+vimConfig VIM;
 
 enum editorKey {
 	BACKSPACE = 127,
@@ -106,12 +120,19 @@ enum editorHighlight {
 	HL_MLCOMMENT
 };
 
+enum editorChange {
+	LINE_DELETE = 0,
+	LINE_ADD,
+	CHAR_DELETE,
+	CHAR_ADD
+};
+
 char welcome[80];
 
 //Prototypes for fedit.c
 void init();
 void moveCursor(int);
-void setStatusMessage(const char *, ...);
+void setStatusMessage(int, const char *, ...);
 void showHelp(const char *);
 void showVersion(const char *);
 
@@ -170,5 +191,8 @@ void updateSyntax(erow *);
 int syntaxToColor(int);
 void selectSyntaxHighlight();
 int isSeperator(int);
+
+//Prototypes for commands.c
+void parseCommandLine(const char *);
 
 #endif

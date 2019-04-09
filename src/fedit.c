@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 		E.vimEmulation = 1;
 	}
 	
-	setStatusMessage("HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
+	setStatusMessage(0, "HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
 
 	while (1) {
 		refreshScreen();
@@ -57,6 +57,9 @@ void init() {
 	E.syntax = NULL;
 	E.indentNewLine = 0;
 	E.vimEmulation = 0;
+
+	VIM.mode = 0;
+	VIM.allchanges = NULL;
 	
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
 		die("getWindowSize");
@@ -106,7 +109,7 @@ void moveCursor(int key) {
 	}
 }
 
-void setStatusMessage(const char *format, ...) {
+void setStatusMessage(int timeout, const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	
@@ -114,7 +117,11 @@ void setStatusMessage(const char *format, ...) {
 	
 	va_end(ap);
 	
-	E.statusmsg_time = time(NULL);
+	if (timeout >= 0) {
+		E.statusmsg_time = time(NULL) + timeout;
+	} else {
+		E.statusmsg_time = time(NULL) + 36000;
+	}
 }
 
 void showHelp(const char *prgname) {

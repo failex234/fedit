@@ -77,7 +77,7 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 
 	while(1) {
 		//Set the status message to the given format string and the user-entered text
-		setStatusMessage(string, buf);
+		setStatusMessage(-1, string, buf);
 		refreshScreen();
 
 		int c = readKey();
@@ -88,7 +88,7 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 			}
 		//Abort prompt when hitting the escape key
 		} else if (c == '\x1b') { 
-			setStatusMessage("");
+			setStatusMessage(0, "");
 
 			if (callback) {
 				callback(buf, c);
@@ -100,7 +100,7 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 		//Confirm the entered text when hitting return
 		} else if (c == '\r') {
 			if (buflen != 0) {
-				setStatusMessage("");
+				setStatusMessage(0, "");
 
 				if (callback) {
 					callback(buf, c);
