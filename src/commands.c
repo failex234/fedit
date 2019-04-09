@@ -30,4 +30,5 @@ void parseCommandLine(const char *command) {
                 break;
         }
     }
+    VIM.force = 0;
 }
