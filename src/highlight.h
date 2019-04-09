@@ -24,7 +24,7 @@ char *JAVA_HL_keywords[] = {
 	"true<", "false<", "new<", "null<", NULL
 };
 
-char JAVASCIRPT_HL_keywords[] = {
+char *JAVASCIRPT_HL_keywords[] = {
 	"var", "let", "await",  "break", "case", "catch", "continue", "debugger", "default",
 	"delete", "do", "else", "finally", "for", "function", "if", "in", "instanceof", 
 	"return", "switch", "throw", "try", "typeof", "void", "while", "with", "enum", "export",
@@ -33,7 +33,7 @@ char JAVASCIRPT_HL_keywords[] = {
 	"undefined<", "this<", "=><", NULL
 };
 
-char PHP_HL_keywords[] = {
+char *PHP_HL_keywords[] = {
 	"__halt_compiler|", "abstract", "array|", "as", "break",
 	"callable", "case", "catch", "class", "clone", "const",
 	"continue", "declare", "default", "die|", "do", "echo", "else",
