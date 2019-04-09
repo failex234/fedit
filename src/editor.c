@@ -205,3 +205,11 @@ void findCallback(char *query, int key) {
 		}
 	}
 }
+
+void quit() {
+	//Erase screen
+	write(STDOUT_FILENO, "\x1b[2J", 4);
+	//Place cursor to default (1,1) position
+	write(STDOUT_FILENO, "\x1b[H", 3);
+	exit(0);
+}

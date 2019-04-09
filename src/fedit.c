@@ -2,6 +2,7 @@
 
 int main(int argc, char **argv) {
 	int enableVim = 0;
+	openfile = NULL;
 	
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
@@ -20,7 +21,7 @@ int main(int argc, char **argv) {
 				
 				return 1;
 			} else {
-				file_open(argv[i]);
+				openfile = argv[i];
 				break;
 			}
 		}
@@ -30,6 +31,10 @@ int main(int argc, char **argv) {
 	
 	if (enableVim) {
 		E.vimEmulation = 1;
+	}
+
+	if (openfile) {
+		file_open(openfile);
 	}
 	
 	setStatusMessage(0, "HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");

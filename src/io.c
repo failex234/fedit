@@ -56,6 +56,17 @@ int readKey() {
 			}
 		}
 		return '\x1b'; 
+	} else if (!(VIM.mode & VIM_INSERT_MODE) && (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
+		switch(c) {
+			case 'h':
+				return ARROW_LEFT;
+			case 'j':
+				return ARROW_DOWN;
+			case 'k':
+				return ARROW_UP;
+			case 'l':
+				return ARROW_RIGHT;
+		}
 	}
 	return c;
 }
@@ -77,11 +88,7 @@ void processKeyPress() {
 				quit_times--;
 				return;
 			}
-			//Erase screen
-			write(STDOUT_FILENO, "\x1b[2J", 4);
-			//Place cursor to default (1,1) position
-			write(STDOUT_FILENO, "\x1b[H", 3);
-			exit(0);
+			quit();
 			break;
 		case CTRL_KEY('s'):
 			file_save();
@@ -111,6 +118,11 @@ void processKeyPress() {
 			{
 				if (c == PAGE_UP) {
 					E.cy = E.rowoff;
+
+					int times = E.screenrows;
+					while(times--) {
+						moveCursor(ARROW_UP);
+					}
 				} else if (c == PAGE_DOWN) {
 					E.cy = E.rowoff + E.screenrows - 1;
 					
@@ -149,6 +161,20 @@ void processKeyPress() {
 					VIM.mode = VIM_INSERT_MODE;
 				}
 				break;
+			case 'o':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					if (E.cy < E.numrows) {
+						E.cx = E.row[E.cy].size;
+					}
+
+					insertNewLine();
+
+					setStatusMessage(-1, "--- INSERT ---");
+					VIM.mode = VIM_INSERT_MODE;
+				}
+				break;
 			case '\x1b':
 				VIM.mode = 0;
 				setStatusMessage(0, "");
@@ -176,7 +202,28 @@ void processKeyPress() {
 					deleteChar();
 				}
 					break;
+			case HOME_KEY:
+				E.cx = 0;
+				break;
+			case END_KEY:
+				//Place the cursor at the end of the line
+				if (E.cy < E.numrows) {
+					E.cx = E.row[E.cy].size;
+				}
+				break;
+			case '\r':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertNewLine();
+				}
+				break;
+			case ARROW_UP:
+			case ARROW_DOWN:
+			case ARROW_LEFT:
+			case ARROW_RIGHT:
+				moveCursor(c);
+				break;
 			default:
+				if (iscntrl(c)) break;
 				if (VIM.mode & VIM_INSERT_MODE) {
 					insertChar(c);
 				}
@@ -188,6 +235,8 @@ void processKeyPress() {
 }
 
 void handleSigWinch(int signal) {
+	UNUSED(signal);
+
 	updateWindowSize();
 	
 	if (E.cy > E.screenrows) E.cy = E.screenrows - 1;

@@ -21,6 +21,7 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define ABUF_INIT {NULL, 0}
+#define UNUSED(x) (void)(x)
 
 #define FEDIT_VERSION "0.0.1"
 #define FEDIT_COMPILE_DATE __DATE__
@@ -31,6 +32,7 @@
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
 #define VIM_INSERT_MODE (1<<0)
+#define VIM_SEARCH_MODE (1<<2)
 
 //Editor row
 typedef struct erow {
@@ -88,6 +90,7 @@ typedef struct textChange {
 
 typedef struct vimConfig {
 	int mode;
+	int force;
 	textChange *allchanges;
 } vimConfig;
 
@@ -128,6 +131,7 @@ enum editorChange {
 };
 
 char welcome[80];
+char *openfile;
 
 //Prototypes for fedit.c
 void init();
@@ -185,6 +189,7 @@ void insertNewLine();
 char *prompt(char *string, void (*callback)(char *, int));
 void find();
 void findCallback(char *, int);
+void quit();
 
 //Prototypes for highlight.c
 void updateSyntax(erow *);

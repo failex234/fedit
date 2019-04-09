@@ -1,13 +1,33 @@
 #include "fedit.h"
 
 void parseCommandLine(const char *command) {
-    if (!strcmp(command, "q")) {
-        //Erase screen
-		write(STDOUT_FILENO, "\x1b[2J", 4);
-		//Place cursor to default (1,1) position
-		write(STDOUT_FILENO, "\x1b[H", 3);
-		exit(0);
-    } else if (!strcmp(command, "w")) {
-        file_save();
+    unsigned int cmdlen = strlen(command);
+    //Go through command
+    for (unsigned int i = 0; i < cmdlen; i++) {
+        if (i - 1 != cmdlen) {
+            VIM.force = command[i + 1] == '!';
+        }
+
+        switch (command[i])
+        {
+            case 'w':
+                file_save();
+                break;
+            case 'q':
+                if (E.modified && !VIM.force) {
+                    setStatusMessage(0, "Warning! file has unsaved changes");
+                } else {
+                    quit();
+                }
+                break;
+            case 'h':
+                setStatusMessage(0, "help menu not done yet");
+                break;
+            case '!':
+                break;
+            default:
+                setStatusMessage(0, "command not recognized");
+                break;
+        }
     }
 }
