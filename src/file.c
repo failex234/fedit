@@ -9,7 +9,9 @@ void file_open(char *filename) {
 	
 	//Kill program when file doesn't exist
 	if (!fp) {
-		die("fopen");
+		//die("fopen");
+		E.filename = filename;
+		return;
 	}
 	
 	char *line = NULL;
