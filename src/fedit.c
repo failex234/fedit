@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 		} else {
 			//Check if there's an argument
 			char *loc = strstr(argv[i], "-");
-			if (loc && (int) loc - argv[i] == 0)  {
+			if (loc && argv[i][0] == '-')  {
 				printf("unknown argument %s\n", argv[i]);
 				
 				return 1;
