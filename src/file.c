@@ -9,7 +9,8 @@ void file_open(char *filename) {
 	
 	//Kill program when file doesn't exist
 	if (!fp) {
-		die("fopen");
+		E.filename = filename;
+		return;
 	}
 	
 	char *line = NULL;
@@ -59,7 +60,7 @@ void file_save() {
 
 		//User aborted file naming process by pressing ESC
 		if (E.filename == NULL) {
-			setStatusMessage("Save aborted!");
+			setStatusMessage(0, "Save aborted!");
 			return;
 		}
 		selectSyntaxHighlight();
@@ -76,7 +77,7 @@ void file_save() {
 				free(buf);
 
 				E.modified = 0;
-				setStatusMessage("%d bytes written to disk!", len);
+				setStatusMessage(0, "%d bytes written to disk!", len);
 
 				return;
 			}
@@ -84,5 +85,5 @@ void file_save() {
 		close(fd);
 	}
 	free(buf);
-	setStatusMessage("Error while trying to save: %s", strerror(errno));
+	setStatusMessage(0, "Error while trying to save: %s", strerror(errno));
 }

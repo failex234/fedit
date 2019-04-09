@@ -56,6 +56,17 @@ int readKey() {
 			}
 		}
 		return '\x1b'; 
+	} else if (!(VIM.mode & VIM_INSERT_MODE) && (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
+		switch(c) {
+			case 'h':
+				return ARROW_LEFT;
+			case 'j':
+				return ARROW_DOWN;
+			case 'k':
+				return ARROW_UP;
+			case 'l':
+				return ARROW_RIGHT;
+		}
 	}
 	return c;
 }
@@ -65,22 +76,19 @@ void processKeyPress() {
 	static int quit_times = FEDIT_QUIT_TIMES;
 
 	int c = readKey();
-	
+
+	if (!E.vimEmulation) {
 	switch(c) {
 		case '\r':
 			insertNewLine();
 			break;
 		case CTRL_KEY('q'):
 			if (E.modified && quit_times > 0) {
-				setStatusMessage("Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.", quit_times, quit_times > 1 ? "s" : "");
+				setStatusMessage(0, "Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.", quit_times, quit_times > 1 ? "s" : "");
 				quit_times--;
 				return;
 			}
-			//Erase screen
-			write(STDOUT_FILENO, "\x1b[2J", 4);
-			//Place cursor to default (1,1) position
-			write(STDOUT_FILENO, "\x1b[H", 3);
-			exit(0);
+			quit();
 			break;
 		case CTRL_KEY('s'):
 			file_save();
@@ -110,6 +118,11 @@ void processKeyPress() {
 			{
 				if (c == PAGE_UP) {
 					E.cy = E.rowoff;
+
+					int times = E.screenrows;
+					while(times--) {
+						moveCursor(ARROW_UP);
+					}
 				} else if (c == PAGE_DOWN) {
 					E.cy = E.rowoff + E.screenrows - 1;
 					
@@ -138,4 +151,96 @@ void processKeyPress() {
 			break;
 	}
 	quit_times = FEDIT_QUIT_TIMES;
+	} else {
+		switch(c) {
+			case 'i':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					setStatusMessage(-1, "--- INSERT ---");
+					VIM.mode = VIM_INSERT_MODE;
+				}
+				break;
+			case 'o':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					if (E.cy < E.numrows) {
+						E.cx = E.row[E.cy].size;
+					}
+
+					insertNewLine();
+
+					setStatusMessage(-1, "--- INSERT ---");
+					VIM.mode = VIM_INSERT_MODE;
+				}
+				break;
+			case '\x1b':
+				VIM.mode = 0;
+				setStatusMessage(0, "");
+				break;
+			case ':':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					char *cmd = prompt(":%s", NULL);
+
+					if (cmd) {
+						parseCommandLine(cmd);
+					} else {
+						setStatusMessage(0, "");
+					}
+				}
+				break;
+			case BACKSPACE:
+			case CTRL_KEY('h'):
+			case DEL_KEY:
+				if (VIM.mode & VIM_INSERT_MODE) {
+					if (c == DEL_KEY) {
+						moveCursor(ARROW_RIGHT);
+					}
+					deleteChar();
+				}
+					break;
+			case HOME_KEY:
+				E.cx = 0;
+				break;
+			case END_KEY:
+				//Place the cursor at the end of the line
+				if (E.cy < E.numrows) {
+					E.cx = E.row[E.cy].size;
+				}
+				break;
+			case '\r':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertNewLine();
+				}
+				break;
+			case ARROW_UP:
+			case ARROW_DOWN:
+			case ARROW_LEFT:
+			case ARROW_RIGHT:
+				moveCursor(c);
+				break;
+			default:
+				if (iscntrl(c)) break;
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				}
+				break;
+		}
+	}
+
+
+}
+
+void handleSigWinch(int signal) {
+	UNUSED(signal);
+
+	updateWindowSize();
+	
+	if (E.cy > E.screenrows) E.cy = E.screenrows - 1;
+	if (E.cx > E.screencols) E.cx = E.screencols - 1;
+	
+	refreshScreen();
 }

@@ -1,13 +1,43 @@
 #include "fedit.h"
 
 int main(int argc, char **argv) {
+	int enableVim = 0;
+	openfile = NULL;
+	
+	for (int i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
+			showHelp(argv[0]);
+			return 0;
+		} else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
+			showVersion(argv[0]);
+			return 0;
+		} else if (!strcmp(argv[i], "--vim") || !strcmp(argv[i], "-e")) {
+			enableVim = 1;
+		} else {
+			//Check if there's an argument
+			char *loc = strstr(argv[i], "-");
+			if (loc && argv[i][0] == '-')  {
+				printf("unknown argument %s\n", argv[i]);
+				
+				return 1;
+			} else {
+				openfile = argv[i];
+				break;
+			}
+		}
+	}
 	enableRawMode();
 	init();
-	if (argc >= 2) {
-		file_open(argv[1]);
+	
+	if (enableVim) {
+		E.vimEmulation = 1;
+	}
+
+	if (openfile) {
+		file_open(openfile);
 	}
 	
-	setStatusMessage("HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
+	setStatusMessage(0, "HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
 
 	while (1) {
 		refreshScreen();
@@ -31,10 +61,16 @@ void init() {
 	E.statusmsg_time = 0;
 	E.syntax = NULL;
 	E.indentNewLine = 0;
+	E.vimEmulation = 0;
+
+	VIM.mode = 0;
+	VIM.allchanges = NULL;
 	
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
 		die("getWindowSize");
 	}
+	
+	signal(SIGWINCH, handleSigWinch);
 	
 	E.screenrows -= 2;
 }
@@ -78,7 +114,7 @@ void moveCursor(int key) {
 	}
 }
 
-void setStatusMessage(const char *format, ...) {
+void setStatusMessage(int timeout, const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	
@@ -86,5 +122,21 @@ void setStatusMessage(const char *format, ...) {
 	
 	va_end(ap);
 	
-	E.statusmsg_time = time(NULL);
+	if (timeout >= 0) {
+		E.statusmsg_time = time(NULL) + timeout;
+	} else {
+		E.statusmsg_time = time(NULL) + 36000;
+	}
+}
+
+void showHelp(const char *prgname) {
+	printf("usage: %s [arguments] files...\n", prgname);
+	printf("\narguments:\n");
+	printf("--vim 	 | -e\t\t\t- enable vim emulation mode\n");
+	printf("--help	 | -h\t\t\t- show help menu\n");
+	printf("--version| -v\t\t\t- show version information\n");
+}
+
+void showVersion(const char *prgname) {
+		printf("%s version %s (%s)\n", prgname, FEDIT_VERSION, FEDIT_COMPILE_DATE);
 }

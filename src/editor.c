@@ -37,15 +37,7 @@ void deleteChar() {
 void insertNewLine() {
 	if (E.cx == 0) {
 		//insert a blank line when we're at the beginning of a line
-		insertRow(E.cy++, "", 0);
-		E.cx = 0;
-		
-		//Indent the next line, when we typed braces
-		for (int i = 0; i < E.indentNewLine; i++) {
-			insertChar('\t');
-		}
-		
-		return;
+		insertRow(E.cy, "", 0);
 	} else {
 		erow *row = &E.row[E.cy];
 
@@ -57,6 +49,19 @@ void insertNewLine() {
 		row->chars[row->size] = '\0';
 
 		updateRow(row);
+		
+		int cx_backup = E.cx;
+		int cy_backup = E.cy;
+		
+		E.cy++;
+		
+		//Indent the next line, when we typed braces
+		for (int i = 0; i < E.indentNewLine; i++) {
+			insertChar('\t');
+		}
+		
+		E.cx = cx_backup;
+		E.cy = cy_backup;
 	}
 	E.cy++;
 	E.cx = 0;
@@ -72,7 +77,7 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 
 	while(1) {
 		//Set the status message to the given format string and the user-entered text
-		setStatusMessage(string, buf);
+		setStatusMessage(-1, string, buf);
 		refreshScreen();
 
 		int c = readKey();
@@ -83,7 +88,7 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 			}
 		//Abort prompt when hitting the escape key
 		} else if (c == '\x1b') { 
-			setStatusMessage("");
+			setStatusMessage(0, "");
 
 			if (callback) {
 				callback(buf, c);
@@ -95,7 +100,7 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 		//Confirm the entered text when hitting return
 		} else if (c == '\r') {
 			if (buflen != 0) {
-				setStatusMessage("");
+				setStatusMessage(0, "");
 
 				if (callback) {
 					callback(buf, c);
@@ -199,4 +204,12 @@ void findCallback(char *query, int key) {
 			break;
 		}
 	}
+}
+
+void quit() {
+	//Erase screen
+	write(STDOUT_FILENO, "\x1b[2J", 4);
+	//Place cursor to default (1,1) position
+	write(STDOUT_FILENO, "\x1b[H", 3);
+	exit(0);
 }

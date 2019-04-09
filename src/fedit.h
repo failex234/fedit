@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <signal.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <string.h>
@@ -20,13 +21,18 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define ABUF_INIT {NULL, 0}
+#define UNUSED(x) (void)(x)
 
 #define FEDIT_VERSION "0.0.1"
+#define FEDIT_COMPILE_DATE __DATE__
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
 
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
+
+#define VIM_INSERT_MODE (1<<0)
+#define VIM_SEARCH_MODE (1<<2)
 
 //Editor row
 typedef struct erow {
@@ -52,6 +58,7 @@ struct editorConfig {
 	erow *row;
 	int modified;
 	int indentNewLine;
+	int vimEmulation;
 	char *filename;
 	char statusmsg[80];
 	time_t statusmsg_time;
@@ -75,7 +82,20 @@ struct abuf {
 	int len;
 };
 
+typedef struct textChange {
+	int c;
+	int changetype;
+	int x, y;
+} textChange;
+
+typedef struct vimConfig {
+	int mode;
+	int force;
+	textChange *allchanges;
+} vimConfig;
+
 struct editorConfig E;
+vimConfig VIM;
 
 enum editorKey {
 	BACKSPACE = 127,
@@ -103,12 +123,22 @@ enum editorHighlight {
 	HL_MLCOMMENT
 };
 
+enum editorChange {
+	LINE_DELETE = 0,
+	LINE_ADD,
+	CHAR_DELETE,
+	CHAR_ADD
+};
+
 char welcome[80];
+char *openfile;
 
 //Prototypes for fedit.c
 void init();
 void moveCursor(int);
-void setStatusMessage(const char *, ...);
+void setStatusMessage(int, const char *, ...);
+void showHelp(const char *);
+void showVersion(const char *);
 
 //Prototypes for terminalmode.c
 void enableRawMode();
@@ -120,6 +150,7 @@ void die(const char *);
 //Prototypes for io.c
 int readKey();
 void processKeyPress();
+void handleSigWinch(int);
 
 //Prototypes for terminal.c
 void refreshScreen();
@@ -129,6 +160,7 @@ void drawStatusBar(struct abuf *);
 void drawMessageBar(struct abuf *);
 int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);
+void updateWindowSize();
 
 //Prototypes for appendbuffer.c
 void abAppend(struct abuf *, const char *, int);
@@ -157,11 +189,15 @@ void insertNewLine();
 char *prompt(char *string, void (*callback)(char *, int));
 void find();
 void findCallback(char *, int);
+void quit();
 
 //Prototypes for highlight.c
 void updateSyntax(erow *);
 int syntaxToColor(int);
 void selectSyntaxHighlight();
 int isSeperator(int);
+
+//Prototypes for commands.c
+void parseCommandLine(const char *);
 
 #endif

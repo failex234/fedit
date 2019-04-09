@@ -240,3 +240,10 @@ void drawMessageBar(struct abuf *ab) {
 		abAppend(ab, E.statusmsg, msglen);
 	}
 }
+
+void updateWindowSize() {
+		if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
+			die("getWindowsSize");
+		}
+		E.screenrows -= 2;
+}
