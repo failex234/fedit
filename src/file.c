@@ -3,7 +3,7 @@ void file_open(char *filename) {
 	free(E.filename);
 	E.filename = strdup(filename);
 
-	//selectSyntaxHighlight();
+	selectSyntaxHighlight();
 	
 	FILE *fp = fopen(filename, "r");
 	

@@ -69,7 +69,7 @@ void updateRow(erow *row) {
 	//set the render size
 	row->rsize = idx;
 
-	//updateSyntax(row);
+	updateSyntax(row);
 }
 
 int rowCxToRx(erow *row, int cx) {
