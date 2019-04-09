@@ -1,7 +1,6 @@
 #include "fedit.h"
 
 int main(int argc, char **argv) {
-	int c;
 	int enableVim = 0;
 	
 	for (int i = 1; i < argc; i++) {
@@ -10,7 +9,7 @@ int main(int argc, char **argv) {
 			return 0;
 		} else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
 			showVersion(argv[0]);
-		} else if (!strcmp(argv[i], "--vim" || !strcmp(argv[i], "-e")) {
+		} else if (!strcmp(argv[i], "--vim") || !strcmp(argv[i], "-e")) {
 			enableVim = 1;
 		} else {
 			//Check if there's an argument
