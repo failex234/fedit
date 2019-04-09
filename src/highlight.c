@@ -108,11 +108,18 @@ void updateSyntax(erow *row) {
             for (j = 0; keywords[j]; j++) {
                 int klen = strlen(keywords[j]);
                 int kw2 = keywords[j][klen - 1] == '|';
+				int kw3 = keywords[j][klen - 1] == '<';
 
-                if (kw2) klen--;
+                if (kw2 ||kw3) klen--;
 
                 if (!strncmp(&row->render[i], keywords[j], klen) && isSeperator(row->render[i + klen])) {
-                    memset(&row->hl[i], kw2 ? HL_KEYWORD2 : HL_KEYWORD1, klen);
+					if (kw2) {
+						memset(&row->hl[i], HL_KEYWORD2, klen);
+					} else if (kw3) {
+						memset(&row->hl[i], HL_KEYWORD3, klen);
+					} else {
+						memset(&row->hl[i], HL_KEYWORD1, klen);
+					}
                     i += klen;
                     break;
                 }
@@ -146,6 +153,7 @@ int syntaxToColor(int hl) {
             return 33;
         case HL_MATCH:
             return 34;
+		case HL_KEYWORD3:
         case HL_STRING:
             return 35;
         case HL_MLCOMMENT:
