@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
 			return 0;
 		} else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
 			showVersion(argv[0]);
+			return 0;
 		} else if (!strcmp(argv[i], "--vim") || !strcmp(argv[i], "-e")) {
 			enableVim = 1;
 		} else {
