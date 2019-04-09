@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <getopt.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <string.h>
@@ -79,13 +78,6 @@ struct abuf {
 };
 
 struct editorConfig E;
-
-static struct option long_options[] = {
-	{"vim",		no_argument,		0, 'e'},
-	{"help",	no_argument,		0, 'h'},
-	{"version",	no_argument,		0, 'v'},
-	{0,			0,					0, 0, }	
-};
 
 enum editorKey {
 	BACKSPACE = 127,

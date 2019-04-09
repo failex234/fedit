@@ -4,23 +4,25 @@ int main(int argc, char **argv) {
 	int c;
 	int enableVim = 0;
 	
-	while(1) {
-		int option_index = 0;
-		
-		c = getopt_long(argc, argv, "ehv", long_options, &option_index);
-		
-		if (c == -1) break;
-		
-		switch(c) {
-			case 'e':
-				enableVim = 1;
+	for (int i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
+			showHelp(argv[0]);
+			return 0;
+		} else if (!strcmp(argv[i], "--version" || !strcmp(argv[i], "-v")) {
+			showVersion(argv[0]);
+		} else if (!strcmp(argv[i], "--vim" || !strcmp(argv[i], "-e")) {
+			enableVim = 1;
+		} else {
+			//Check if there's an argument
+			char *loc = strstr(argv[i], "-");
+			if (loc && (int) loc - argv[i] == 0)  {
+				printf("unknown argument %s\n", argv[i]);
+				
+				return 1;
+			} else {
+				file_open(argv[i]);
 				break;
-			case 'v':
-				showVersion(argv[0]);
-				return 0;
-			case 'h':
-				showHelp(argv[0]);
-				return 0;
+			}
 		}
 	}
 	enableRawMode();
@@ -114,7 +116,7 @@ void setStatusMessage(const char *format, ...) {
 }
 
 void showHelp(const char *prgname) {
-	printf("usage: %s [arguments] files...\n", prgname, FEDIT_VERSION);
+	printf("usage: %s [arguments] files...\n", prgname);
 	printf("\narguments:\n");
 	printf("--vim 	 | -e\t\t\t- enable vim emulation mode\n");
 	printf("--help	 | -h\t\t\t- show help menu\n");
