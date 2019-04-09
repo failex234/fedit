@@ -34,7 +34,7 @@ void updateSyntax(erow *row) {
         //Handle comments
         if (scs_len && !in_string && !in_comment) {
             if (!strncmp(&row->render[i], scs, scs_len)) {
-                memset(&row->hl[i], HL_COMMENT, row->rsize);
+                memset(&row->hl[i], HL_COMMENT, row->rsize - i);
                 break;
             }
         }
@@ -178,6 +178,13 @@ void selectSyntaxHighlight() {
 
             if ((is_ext && ext && !strcmp(ext, s->filematch[i])) || (!is_ext && strstr(E.filename, s->filematch[i]))) {
                 E.syntax = s;
+				
+				int filerow;
+				
+				for (filerow = 0; filerow < E.numrows; filerow++) {
+					updateSyntax(&E.row[filerow]);
+				}
+				
                 return;
             }
             i++;

@@ -34,7 +34,7 @@ void drawRows(struct abuf *ab) {
 		int filerow = i + E.rowoff;
 		if (filerow >= E.numrows) {
 			//Display welcome message
-			if (E.numrows == 0 && i == E.screenrows / 2) {
+			if (E.numrows == 0 && i == E.screenrows / 3) {
 				int welcomelen = snprintf(welcome, sizeof(welcome),
 					"FEdit -- version %s", FEDIT_VERSION);
 				
@@ -76,7 +76,7 @@ void drawRows(struct abuf *ab) {
 
 			//Get the color of each highlight and print
 			//the corresponding escape sequence with it
-      		for (int i = 0; i < len; i++) {
+      		for (int i = 0; i < len; i++) {0
 				if (iscntrl(c[i])) {
 					char sym = (c[i] <= 26) ? '@' + c[i] : '?';
 					abAppend(ab, "\x1b[7m", 4);
