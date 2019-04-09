@@ -51,7 +51,7 @@ struct editorConfig {
 	int numrows;
 	erow *row;
 	int modified;
-	int indentNextLine;
+	int indentNewLine;
 	char *filename;
 	char statusmsg[80];
 	time_t statusmsg_time;
