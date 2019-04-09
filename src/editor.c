@@ -3,6 +3,13 @@ void insertChar(int c) {
 	if (E.cy == E.numrows) {
 		insertRow(E.numrows, "", 0);
 	}
+	
+	if (c == '{') {
+		E.indentNewLine++;
+	} else if (c == '}' && E.indentNewLine != 0) {
+		E.indentNewLine--;
+	}
+	
 	rowInsertChar(&E.row[E.cy], E.cx, c);
 	E.cx++;
 }
@@ -17,7 +24,7 @@ void deleteChar() {
 		rowDeleteChar(row, E.cx - 1);
 		E.cx--;
 	} else {
-		//Append the text of the current line to the line above and then delete the current lin
+		//Append the text of the current line to the line above and then delete the current line
 		E.cx = E.row[E.cy - 1].size;
 
 		rowAppendString(&E.row[E.cy - 1], row->chars, row->size);
@@ -30,7 +37,15 @@ void deleteChar() {
 void insertNewLine() {
 	if (E.cx == 0) {
 		//insert a blank line when we're at the beginning of a line
-		insertRow(E.cy, "", 0);
+		insertRow(E.cy++, "", 0);
+		E.cx = 0;
+		
+		//Indent the next line, when we typed braces
+		for (int i = 0; i < E.indentNewLine; i++) {
+			insertChar('\t');
+		}
+		
+		return;
 	} else {
 		erow *row = &E.row[E.cy];
 

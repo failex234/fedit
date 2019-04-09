@@ -30,7 +30,7 @@ struct editorSyntax HLDB[] = {
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
  },
  {
-	 "Java"
+	 "Java",
 	 JAVA_HL_extentions,
 	 JAVA_HL_keywords,
 	 "//", "/*", "*/",
