@@ -62,6 +62,8 @@ void init() {
 		die("getWindowSize");
 	}
 	
+	signal(SIGWINCH, handleSigWinch);
+	
 	E.screenrows -= 2;
 }
 

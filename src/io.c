@@ -139,3 +139,12 @@ void processKeyPress() {
 	}
 	quit_times = FEDIT_QUIT_TIMES;
 }
+
+void handleSigWinch(int signal) {
+	updateWindowSize();
+	
+	if (E.cy > E.screenrows) E.cy = E.screenrows - 1;
+	if (E.cx > E.screencols) E.cx = E.screencols - 1;
+	
+	refreshScreen();
+}

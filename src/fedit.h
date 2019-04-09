@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <signal.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <string.h>
@@ -124,6 +125,7 @@ void die(const char *);
 //Prototypes for io.c
 int readKey();
 void processKeyPress();
+void handleSigWinch(int);
 
 //Prototypes for terminal.c
 void refreshScreen();
@@ -133,6 +135,7 @@ void drawStatusBar(struct abuf *);
 void drawMessageBar(struct abuf *);
 int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);
+void updateWindowSize();
 
 //Prototypes for appendbuffer.c
 void abAppend(struct abuf *, const char *, int);
