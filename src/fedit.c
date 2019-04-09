@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
 		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
 			showHelp(argv[0]);
 			return 0;
-		} else if (!strcmp(argv[i], "--version" || !strcmp(argv[i], "-v")) {
+		} else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
 			showVersion(argv[0]);
 		} else if (!strcmp(argv[i], "--vim" || !strcmp(argv[i], "-e")) {
 			enableVim = 1;
