@@ -37,15 +37,7 @@ void deleteChar() {
 void insertNewLine() {
 	if (E.cx == 0) {
 		//insert a blank line when we're at the beginning of a line
-		insertRow(E.cy++, "", 0);
-		E.cx = 0;
-		
-		//Indent the next line, when we typed braces
-		for (int i = 0; i < E.indentNewLine; i++) {
-			insertChar('\t');
-		}
-		
-		return;
+		insertRow(E.cy, "", 0);
 	} else {
 		erow *row = &E.row[E.cy];
 
@@ -55,6 +47,16 @@ void insertNewLine() {
 		row = &E.row[E.cy];
 		row->size = E.cx;
 		row->chars[row->size] = '\0';
+		
+		int cx_backup = E.cx;
+		
+		//Indent the next line, when we typed braces
+		for (int i = 0; i < E.indentNewLine; i++) {
+			insertChar('\t');
+		}
+		
+		E.cx = cx_backup;
+		
 
 		updateRow(row);
 	}
