@@ -76,7 +76,7 @@ void drawRows(struct abuf *ab) {
 
 			//Get the color of each highlight and print
 			//the corresponding escape sequence with it
-      		for (int i = 0; i < len; i++) {0
+      		for (int i = 0; i < len; i++) {
 				if (iscntrl(c[i])) {
 					char sym = (c[i] <= 26) ? '@' + c[i] : '?';
 					abAppend(ab, "\x1b[7m", 4);
