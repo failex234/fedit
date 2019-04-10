@@ -34,6 +34,7 @@
 #define VIM_INSERT_MODE (1<<0)
 #define VIM_PROMPT_MODE (1<<1)
 #define VIM_SEARCH_MODE (1<<2)
+#define VIM_DELETE_MODE (1<<3)
 
 //Editor row
 typedef struct erow {
@@ -202,5 +203,6 @@ int isSeperator(int);
 void parseCommandLine(char *);
 int parseForceFlag(char *);
 char *getCommand(char *, int);
+char *getArgument(char *);
 
 #endif
