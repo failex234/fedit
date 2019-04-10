@@ -1,6 +1,6 @@
 #include "fedit.h"
 
-void parseCommandLine(const char *command) {
+void parseCommandLine(char *command) {
     int hasForceFlag = parseForceFlag(command);
 	char *cmdonly = getCommand(command, hasForceFlag);
 	
@@ -25,8 +25,8 @@ void parseCommandLine(const char *command) {
 	free(command);
 }
 
-int parseForceFlag(const char *string) {
-	int sep_found = 0;
+int parseForceFlag(char *string) {
+	int sepfound = 0;
 	int idx = 0;
 	for (unsigned int i = 0; i < strlen(string); i++) {
 		if (string[i] == '!' && !sepfound) {
@@ -39,7 +39,7 @@ int parseForceFlag(const char *string) {
 	return idx;
 }
 
-char *getCommand(const char *string, int hasForce) {
+char *getCommand(char *string, int hasForce) {
 	char *command;
 	if (hasForce) {
 		command = strtok(string, "!");
@@ -48,8 +48,4 @@ char *getCommand(const char *string, int hasForce) {
 	}
 	
 	return command;
-}
-
-char *getArgument(const char *string) {
-	
 }
