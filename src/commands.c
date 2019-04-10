@@ -7,6 +7,9 @@ void parseCommandLine(char *command) {
 
 	if (cmdonly) {
         if (!strcmp(cmdonly, "w")) {
+			if (argument) {
+				E.filename = argument;
+			}
             file_save();
         } else if (!strcmp(cmdonly, "q")) {
             if (E.modified && !hasForceFlag) {
@@ -15,8 +18,12 @@ void parseCommandLine(char *command) {
                 quit();
             }
         } else if (!strcmp(cmdonly, "wq")) {
-            file_save();
-            quit();
+			if (argument) {
+				E.filename = argument;
+			}
+            if (file_save()) {
+            	quit();
+			}
         } else if (!strcmp(cmdonly, "a")) {
             if (argument) {
                 setStatusMessage(0, "Argument: %s", argument);

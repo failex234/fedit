@@ -64,6 +64,7 @@ void init() {
 	E.vimEmulation = 0;
 
 	VIM.mode = 0;
+	VIM.delwords = 0;
 	VIM.allchanges = NULL;
 	
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) {

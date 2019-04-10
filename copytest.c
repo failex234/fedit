@@ -7,7 +7,7 @@ void file_open(char *filename) {
 	
 	FILE *fp = fopen(filename, "r");
 	
-	//Kill program when file doesn't exist
+	Kill program when file doesn't exist
 	if (!fp) {
 		E.filename = filename;
 		return;
@@ -17,12 +17,12 @@ void file_open(char *filename) {
 	size_t linecap = 0;
 	ssize_t linelen;
 	
-	//Read line and cut off carriage-return or newline
+	Read line and cut off carriage-return or newline
 	while ((linelen = getline(&line, &linecap, fp)) != -1) {
 		while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r')) {
 			linelen--;
 		}
-		//Add line to current editor rows
+		Add line to current editor rows
 		insertRow(E.numrows, line, linelen);
 	}
 	free(line);
@@ -54,11 +54,11 @@ char *rows_to_string(int *buflen) {
 }
 
 int file_save() {
-	//Check if a file is opened
+	Check if a file is opened
 	if (E.filename == NULL) {
 		E.filename = prompt("Save as: %s", NULL);
 
-		//User aborted file naming process by pressing ESC
+		User aborted file naming process by pressing ESC
 		if (E.filename == NULL) {
 			setStatusMessage(0, "Save aborted!");
 			return 0;
@@ -88,4 +88,4 @@ int file_save() {
 	free(buf);
 	setStatusMessage(0, "Error while trying to save: %s", strerror(errno));
 	return 0;
-}
+}																																																																																																																																											
