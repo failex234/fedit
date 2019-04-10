@@ -61,30 +61,14 @@ char *getCommand(char *string, int hasForce) {
 }
 
 char *getArgument(char *string) {
-	char *prearg;
 	char *argument;
+	argument = strstr(string, " ");
 	
-	unsigned int len = strlen(string);
-	int seppos = 0;
-	
-	//Find the space between command and argument
-	for (unsigned int i = 0; i < len; i++) {
-		if (string[i] == ' ' && string[i + 1] != NULL) {
-			seppos = (signed int) i;
-			break;
-		}
-	}
-	
-	if(!seppos) {
+	if (!argument) {
 		return NULL;
 	}
 	
-	//Let prearg point to the character behind the space
-	prearg = *(string + seppos + 1);
-	argument = malloc(len - seppos);
-	
-	//Copy everything behind the space into argument char
-	memcpy(argument, prearg, len - seppos);
+	argument++;
 	
 	return argument;
 	
