@@ -62,14 +62,20 @@ char *getCommand(char *string, int hasForce) {
 
 char *getArgument(char *string) {
 	char *argument;
+	char *newarg;
+	unsigned int len;
+	
 	argument = strstr(string, " ");
 	
 	if (!argument) {
 		return NULL;
 	}
 	
-	argument++;
+	len = strlen(argument) - 1;
+	newarg = malloc(len);
 	
-	return argument;
+	memcpy(newarg, argument + 1, len);
+	
+	return nearg;
 	
 }
