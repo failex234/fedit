@@ -32,7 +32,7 @@ int parseForceFlag(char *string) {
 		if (string[i] == '!' && !sepfound) {
 			idx = (signed int) i;
 		} else if (string[i] == ' ') {
-			sep_found = 1;
+			sepfound = 1;
 		}
 	}
 	
