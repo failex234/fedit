@@ -3,15 +3,31 @@
 #include "fedit.h"
 
 char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL};
-char *JAVA_HL_extentions[] = { ".java", NULL };
-char *JAVASCRIPT_HL_extentions[] = { ".js", NULL };
-char *PHP_HL_extentions[] = { ".php", NULL };
+char *CS_HL_extension[] = { ".cs", NULL };
+char *JAVA_HL_extensions[] = { ".java", NULL };
+char *JAVASCRIPT_HL_extensions[] = { ".js", NULL };
+char *PHP_HL_extensions[] = { ".php", NULL };
+char *PY_HL_extensions[] = { ".py", NULL };
 
 
 char *C_HL_keywords[] = {
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
 	"struct", "union", "typedef", "enum", "class", "case", "volatile", "extern",
-	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|", "void|", NULL
+	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|", "void|",
+	"-><", NULL
+};
+
+char *CS_HL_keywords[] = {
+	"abstract", "const", "event", "override", "partial", "readonly",
+	"sealed", "static", "unsafe", "virtual", "volatile", "public", "private", "internal",
+	"protected", "if", "else", "switch", "case", "do", "for", "foreach", "in", "while",
+	"break", "continue", "default", "goto", "return", "yield", "throw", "try", "catch",
+	"finally", "fixed", "lock", "as", "bool|", "byte|", "char|", "class|", "decimal|",
+	"double|", "enum|", "float|", "int|", "long|", "sbyte|", "short|", "string|",
+	"struct|", "uint|", "ulong|", "ushort|", "::<", "=><", "as<", "await<", "async<",
+	"new<", "null<", "true<", "false<", "value<", "void<", "base<", "this<", "using<",
+	"extern<", "params<", "ref<", "out<", "is<", "sizeof<", "typeof<", "stackalloc<",
+	"check<", "unchecked<", NULL
 };
 
 char *JAVA_HL_keywords[] = {
@@ -44,38 +60,60 @@ char *PHP_HL_keywords[] = {
 	"interface", "isset|", "list|", "namespace", "print", "private",
 	"protected", "public", "require", "require_once", "return", "static",
 	"switch", "throw", "trait", "try", "unset|", "use", "while", "yield",
-	"yield from", "new<", "var<", "true<", "false<", "or<", "xor<", "and<", NULL
+	"yield from", "new<", "var<", "true<", "false<", "or<", "xor<", "and<",
+	"$<", NULL
+};
+
+char *PY_HL_keywords[] {
+	"and", "as", "assert", "break", "class", "continue", "def", "del", "elif",
+	"else", "except", "finally", "for", "from", "global", "if", "import", "in",
+	"is", "lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try",
+	"while", "with", "yield", "True<", "False<", "None<", NULL
 };
 
 struct editorSyntax HLDB[] = {
  {
-	 "C",
+	 "C/C++",
 	 C_HL_extensions,
 	 C_HL_keywords,
 	 "//", "/*", "*/",
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
  },
  {
+	"C#",
+	CS_HL_extension,
+	CS_HL_keywords,
+	"//", "/*", "*/",
+	HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+ },
+ {
 	 "Java",
-	 JAVA_HL_extentions,
+	 JAVA_HL_extensions,
 	 JAVA_HL_keywords,
 	 "//", "/*", "*/",
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
  },
  {
 	 "JavaScript",
-	 JAVASCRIPT_HL_extentions,
+	 JAVASCRIPT_HL_extensions,
 	 JAVASCIRPT_HL_keywords,
 	 "//", "/*", "*/",
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
  },
  {
 	 "PHP",
-	 PHP_HL_extentions,
+	 PHP_HL_extensions,
 	 PHP_HL_keywords,
 	 "//", "/*", "*/",
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
  },
+ {
+	 "Python",
+	 PY_HL_extensions,
+	 PY_HL_keywords,
+	 "#", "\"\"\"", "\"\"\"",
+	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+ }
 };
 
 
