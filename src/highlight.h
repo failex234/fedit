@@ -14,7 +14,7 @@ char *C_HL_keywords[] = {
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
 	"struct", "union", "typedef", "enum", "class", "case", "volatile", "extern",
 	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|", "void|",
-	"-><", NULL
+	"-><", "NULL<", NULL
 };
 
 char *CS_HL_keywords[] = {
@@ -41,7 +41,7 @@ char *JAVA_HL_keywords[] = {
 };
 
 char *JAVASCIRPT_HL_keywords[] = {
-	"var", "let", "await",  "break", "case", "catch", "continue", "debugger", "default",
+	"var|", "let|", "await",  "break", "case", "catch", "continue", "debugger", "default",
 	"delete", "do", "else", "finally", "for", "function", "if", "in", "instanceof", 
 	"return", "switch", "throw", "try", "typeof", "void", "while", "with", "enum", "export",
 	"extends", "import", "super", "implements", "interface", "package", "private", "protected",

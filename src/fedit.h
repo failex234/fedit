@@ -200,5 +200,8 @@ int isSeperator(int);
 
 //Prototypes for commands.c
 void parseCommandLine(const char *);
+int parseForceFlag(const char *);
+char *getCommand(const char *, int);
+char *getArgument(const char *);
 
 #endif
