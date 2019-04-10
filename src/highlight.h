@@ -64,7 +64,7 @@ char *PHP_HL_keywords[] = {
 	"$<", NULL
 };
 
-char *PY_HL_keywords[] {
+char *PY_HL_keywords[] = {
 	"and", "as", "assert", "break", "class", "continue", "def", "del", "elif",
 	"else", "except", "finally", "for", "from", "global", "if", "import", "in",
 	"is", "lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try",
