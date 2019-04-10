@@ -64,7 +64,7 @@ char *getArgument(char *string) {
 	char *prearg;
 	char *argument;
 	
-	int len = strlen(string);
+	unsigned int len = strlen(string);
 	int seppos = 0;
 	
 	//Find the space between command and argument
@@ -80,7 +80,7 @@ char *getArgument(char *string) {
 	}
 	
 	//Let prearg point to the character behind the space
-	prearg = *string + seppos + 1;
+	prearg = *(string + seppos + 1);
 	argument = malloc(len - seppos);
 	
 	//Copy everything behind the space into argument char
