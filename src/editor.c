@@ -75,6 +75,10 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 	size_t buflen = 0;
 	buf[0] = '\0';
 
+	if (E.vimEmulation) {
+		VIM.mode |= VIM_PROMPT_MODE;
+	}
+
 	while(1) {
 		//Set the status message to the given format string and the user-entered text
 		setStatusMessage(-1, string, buf);
@@ -96,6 +100,11 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 
 			free(buf);
 
+			//Exit vim prompt mode
+			if (E.vimEmulation) {
+				VIM.mode ^= VIM_PROMPT_MODE;
+			}
+
 			return NULL;
 		//Confirm the entered text when hitting return
 		} else if (c == '\r') {
@@ -104,6 +113,11 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 
 				if (callback) {
 					callback(buf, c);
+				}
+
+				//Exit vim prompt mode
+				if (E.vimEmulation) {
+					VIM.mode ^= VIM_PROMPT_MODE;
 				}
 
 				return buf;

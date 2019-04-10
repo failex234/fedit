@@ -31,13 +31,13 @@ int main(int argc, char **argv) {
 	
 	if (enableVim) {
 		E.vimEmulation = 1;
+	} else {
+		setStatusMessage(0, "HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
 	}
 
 	if (openfile) {
 		file_open(openfile);
 	}
-	
-	setStatusMessage(0, "HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find");
 
 	while (1) {
 		refreshScreen();

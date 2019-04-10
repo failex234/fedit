@@ -32,6 +32,7 @@
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
 #define VIM_INSERT_MODE (1<<0)
+#define VIM_PROMPT_MODE (1<<1)
 #define VIM_SEARCH_MODE (1<<2)
 
 //Editor row
@@ -198,6 +199,8 @@ void selectSyntaxHighlight();
 int isSeperator(int);
 
 //Prototypes for commands.c
-void parseCommandLine(const char *);
+void parseCommandLine(char *);
+int parseForceFlag(char *);
+char *getCommand(char *, int);
 
 #endif

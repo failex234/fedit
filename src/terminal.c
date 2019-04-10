@@ -205,7 +205,7 @@ void drawStatusBar(struct abuf *ab) {
 	abAppend(ab, "\x1b[7m", 4);
 	char status[80], rstatus[80];
 	
-	int len = snprintf(status, sizeof(status), "%s %.20s - %d lines", E.modified ? "(modified)" : "", E.filename ? E.filename : "[No Name]", E.numrows);
+	int len = snprintf(status, sizeof(status), "%s %.20s - %d line%s", E.modified ? "(modified)" : "", E.filename ? E.filename : "[No Name]", E.numrows, E.numrows == 1 ? "" : "s");
 	int rlen = snprintf(rstatus, sizeof(rstatus), "(%s) %d/%d - %d", E.syntax ? E.syntax->filetype : "Plain Text", E.cy + 1 > E.numrows ? E.cy : E.cy + 1, E.numrows, E.cx + 1);
 	
 	if (len > E.screencols) {

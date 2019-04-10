@@ -1,34 +1,51 @@
 #include "fedit.h"
 
-void parseCommandLine(const char *command) {
-    unsigned int cmdlen = strlen(command);
-    //Go through command
-    for (unsigned int i = 0; i < cmdlen; i++) {
-        if (i - 1 != cmdlen) {
-            VIM.force = command[i + 1] == '!';
-        }
+void parseCommandLine(char *command) {
+    int hasForceFlag = parseForceFlag(command);
+	char *cmdonly = getCommand(command, hasForceFlag);
+	
+	if (!strcmp(cmdonly, "w")) {
+		file_save();
+	} else if (!strcmp(cmdonly, "q")) {
+		if (E.modified && !hasForceFlag) {
+			setStatusMessage(0, "Warning! File has unsaved changed");
+		} else {
+			quit();
+		}
+	} else if (!strcmp(cmdonly, "wq")) {
+		file_save();
+		quit();
+		
+	} else if (!strcmp(cmdonly, "h")) {
+		setStatusMessage(0, "No help menu yet :(");
+	} else {
+		setStatusMessage(0, "Command not recognized");
+	}
+	
+	free(command);
+}
 
-        switch (command[i])
-        {
-            case 'w':
-                file_save();
-                break;
-            case 'q':
-                if (E.modified && !VIM.force) {
-                    setStatusMessage(0, "Warning! file has unsaved changes");
-                } else {
-                    quit();
-                }
-                break;
-            case 'h':
-                setStatusMessage(0, "help menu not done yet");
-                break;
-            case '!':
-                break;
-            default:
-                setStatusMessage(0, "command not recognized");
-                break;
-        }
-    }
-    VIM.force = 0;
+int parseForceFlag(char *string) {
+	int sepfound = 0;
+	int idx = 0;
+	for (unsigned int i = 0; i < strlen(string); i++) {
+		if (string[i] == '!' && !sepfound) {
+			idx = (signed int) i;
+		} else if (string[i] == ' ') {
+			sepfound = 1;
+		}
+	}
+	
+	return idx;
+}
+
+char *getCommand(char *string, int hasForce) {
+	char *command;
+	if (hasForce) {
+		command = strtok(string, "!");
+	} else {
+		command = strtok(string, " ");
+	}
+	
+	return command;
 }

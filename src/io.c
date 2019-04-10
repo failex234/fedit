@@ -56,7 +56,7 @@ int readKey() {
 			}
 		}
 		return '\x1b'; 
-	} else if (!(VIM.mode & VIM_INSERT_MODE) && (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
+	} else if (E.vimEmulation && !(VIM.mode & VIM_INSERT_MODE) && !(VIM.mode & VIM_PROMPT_MODE) && (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
 		switch(c) {
 			case 'h':
 				return ARROW_LEFT;
