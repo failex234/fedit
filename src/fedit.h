@@ -199,8 +199,8 @@ void selectSyntaxHighlight();
 int isSeperator(int);
 
 //Prototypes for commands.c
-void parseCommandLine(const char);
-int parseForceFlag(const cha*);
-char *getCommand(const char, int);
+void parseCommandLine(char *);
+int parseForceFlag(char *);
+char *getCommand(char *, int);
 
 #endif
