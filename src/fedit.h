@@ -208,6 +208,6 @@ char *getArgument(char *);
 
 //Prototypes for delete.c
 void addAsDigit(int);
-void deleteNWords(int, int);
+void deleteNWords(int);
 
 #endif

@@ -279,7 +279,7 @@ void processKeyPress() {
 				break;
 			case 'd':
 				if (VIM.delwords) {
-					deleteNWords(VIM.delwords, 0);
+					deleteNWords(VIM.delwords);
 					VIM.delwords = 0;
 				} else {
 					deleteRow(E.cy);
@@ -289,10 +289,12 @@ void processKeyPress() {
 				break;
 			case 'e':
 				if (VIM.delwords) {
-					deleteNWords(VIM.delwords, 1);
+					deleteNWords(VIM.delwords);
 				} else {
-					deleteNWords(1, 1);
+					deleteNWords(1);
 				}
+				VIM.mode = 0;
+				setStatusMessage(0, "");
 				break;
 			default:
 				if (!isdigit(c)) break;
