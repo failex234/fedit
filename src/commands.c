@@ -4,31 +4,35 @@ void parseCommandLine(char *command) {
     int hasForceFlag = parseForceFlag(command);
 	char *cmdonly = getCommand(command, hasForceFlag);
 	char *argument = getArgument(command);
-	
-	if (!strcmp(cmdonly, "w")) {
-		file_save();
-	} else if (!strcmp(cmdonly, "q")) {
-		if (E.modified && !hasForceFlag) {
-			setStatusMessage(0, "Warning! File has unsaved changed");
-		} else {
-			quit();
-		}
-	} else if (!strcmp(cmdonly, "wq")) {
-		file_save();
-		quit();
-	} else if (!strcmp(cmdonly, "a")) {
-		if (argument) {
-			setStatusMessage(0, "Argument: %s", argument);
-		} else {
-			setStatusMessage(0, "No argument given :(");
-		}
-	} else if (!strcmp(cmdonly, "h")) {
-		setStatusMessage(0, "No help menu yet :(");
-	} else {
-		setStatusMessage(0, "Command not recognized");
+
+	if (cmdonly) {
+        if (!strcmp(cmdonly, "w")) {
+            file_save();
+        } else if (!strcmp(cmdonly, "q")) {
+            if (E.modified && !hasForceFlag) {
+                setStatusMessage(0, "Warning! File has unsaved changed");
+            } else {
+                quit();
+            }
+        } else if (!strcmp(cmdonly, "wq")) {
+            file_save();
+            quit();
+        } else if (!strcmp(cmdonly, "a")) {
+            if (argument) {
+                setStatusMessage(0, "Argument: %s", argument);
+            } else {
+                setStatusMessage(0, "No argument given :(");
+            }
+        } else if (!strcmp(cmdonly, "h")) {
+            setStatusMessage(0, "No help menu yet :(");
+        } else {
+            setStatusMessage(0, "Command not recognized");
+        }
+
+        free(command);
+    } else {
+	    setStatusMessage(0, "Command not recognized %s");
 	}
-	
-	free(command);
 }
 
 int parseForceFlag(char *string) {
@@ -50,11 +54,38 @@ int parseForceFlag(char *string) {
 
 char *getCommand(char *string, int hasForce) {
 	char *command;
+	char splitchar;
+	uint len = strlen(string);
+	int sepfound = 0;
+	int idx = 0;
 	
+	//If user is forcing a command we want to look for the ! instead of a space
 	if (hasForce) {
-		command = strtok(string, "!");
+		splitchar = '!';
 	} else {
-		command = strtok(string, " ");
+		splitchar = ' ';
+	}
+
+	for (uint i = 0; i < len; i++) {
+		//Make sure that we find the splitchar before a space
+	    if (!sepfound && string[i] == splitchar) {
+	        idx = i;
+	        break;
+	    }
+	    if (string[i] == ' ') {
+	        sepfound = 1;
+	    }
+	}
+
+	//If there are no arguments, copy the command over and add a null-terminator
+	if (!idx && len > 0) {
+	    command = malloc(len + 1);
+		memcpy(command, string, len);
+		command[len] = '\0';
+	} else {
+		command = malloc(idx + 1);
+		memcpy(command, string, idx);
+		command[idx] = '\0';
 	}
 	
 	return command;
@@ -65,17 +96,20 @@ char *getArgument(char *string) {
 	char *newarg;
 	unsigned int len;
 	
+	//Check if string contains a space
 	argument = strstr(string, " ");
 	
 	if (!argument) {
 		return NULL;
 	}
 	
+	//Copy the characters behind the first space into a new string
 	len = strlen(argument) - 1;
-	newarg = malloc(len);
+	newarg = malloc(len + 1);
 	
 	memcpy(newarg, argument + 1, len);
+	newarg[len] = '\0';
 	
-	return nearg;
+	return newarg;
 	
 }
