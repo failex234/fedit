@@ -13,39 +13,38 @@ void addAsDigit(int number) {
 
 
 void deleteNWords(int number) {
-    int spaces = 0;
-    char *currrow = E.row[E.cy].chars;
-
-    int currPos = E.cx;
-    int rowSize = E.row[E.cy].size;
-    int i = currPos;
-    int endidx;
-
-    //Look for the last space
-    while (i < rowSize && number != spaces) {
-        if (currrow[i] == ' ') {
-            spaces++;
-        }
-        i++;
-    }
-
-    if (spaces != number) {
-        endidx = rowSize;
-    } else {
-        endidx = i;
-    }
-
-
-    //Replace the current line with all the characters
-    //behind the word when the cursor is at position 0
-    if (!currPos) {
-        char *behind = malloc(rowSize - endidx);
-        memcpy(behind, &currrow[endidx], rowSize - endidx);
-        behind[rowSize - endidx] = '\0';
-
-        deleteRow(E.cy);
-        insertRow(E.cy, behind, rowSize - endidx);
-    } else if (currPos != rowSize - 1) {
-    }
+	int spaces = 0;
+	int startidx = 0;
+	int endidx = 0;
+	int i = 0;
+	
+	char *currRow = E.row[E.cy].chars;
+	int rowSize = E.row[E.cy].size;
+	
+	//Find the last space before the word
+	for (i = 0; i < E.cx; i++) {
+		if (currRow[i] == ' ') {
+			startidx = i;
+		}
+	}
+	i = startidx;
+	
+	while(spaces != number && i < rowSize) {
+		if (currRow[i] == ' ') {
+			spaces++;
+		}
+		i++;
+	}
+	
+	endidx = i;
+	
+	char *newrow = malloc(startidx + (rowSize - endidx))
+	memcpy(newrow, currRow, startidx);
+	memcpy(&newrow[startidx], &currRow[endidx + 1], rowSize - endidx - 1);
+	
+	newrow[startidx + rowSize - endidx - 1] = '\0';
+	
+	deleteRow(E.cy);
+	insertRow(E.cy, newrow, startidx + rowSize - endidx - 1);	
 
 }
