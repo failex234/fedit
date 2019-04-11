@@ -295,6 +295,7 @@ void processKeyPress() {
 					deleteNWords(atoi(VIM.delwords));
 					free(VIM.delwords);
 					VIM.delwordsSize = 0;
+					VIM.delwords = NULL;
 				} else {
 					deleteRow(E.cy);
 				}
@@ -307,6 +308,7 @@ void processKeyPress() {
 					deleteNWords(atoi(VIM.delwords));
 					free(VIM.delwords);
 					VIM.delwordsSize = 0;
+					VIM.delwords = NULL;
 				} else {
 					deleteNWords(1);
 				}
