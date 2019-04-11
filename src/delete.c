@@ -13,7 +13,7 @@ void deleteNWords(int number) {
 	int endidx = 0;
 	int i = 0;
 	
-	if (E.row[E.cy] == NULL) {
+	if (E.row[E.cy].chars == NULL) {
 		return;
 	}
 	
