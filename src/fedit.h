@@ -34,6 +34,7 @@
 #define VIM_INSERT_MODE (1<<0)
 #define VIM_PROMPT_MODE (1<<1)
 #define VIM_SEARCH_MODE (1<<2)
+#define VIM_DELETE_MODE (1<<3)
 
 //Editor row
 typedef struct erow {
@@ -91,7 +92,8 @@ typedef struct textChange {
 
 typedef struct vimConfig {
 	int mode;
-	int force;
+	int delwordsSize;
+	char *delwords;
 	textChange *allchanges;
 } vimConfig;
 
@@ -163,13 +165,14 @@ int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);
 void updateWindowSize();
 
-//Prototypes for appendbuffer.c
+//Prototyped for appendbuffer.c
 void abAppend(struct abuf *, const char *, int);
 void abFree(struct abuf *);
 
+
 //Prototypes for file.c
 void file_open(char *);
-void file_save();
+int file_save();
 char *rows_to_string(int *);
 
 //Prototypes for rows.c
@@ -202,5 +205,10 @@ int isSeperator(int);
 void parseCommandLine(char *);
 int parseForceFlag(char *);
 char *getCommand(char *, int);
+char *getArgument(char *);
+
+//Prototypes for delete.c
+void addToDeleteWords(char);
+void deleteNWords(int);
 
 #endif

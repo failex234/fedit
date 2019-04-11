@@ -103,6 +103,7 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 			//Exit vim prompt mode
 			if (E.vimEmulation) {
 				VIM.mode ^= VIM_PROMPT_MODE;
+				VIM.mode ^= VIM_SEARCH_MODE;
 			}
 
 			return NULL;
@@ -145,7 +146,13 @@ void find() {
 	int saved_coloff = E.coloff;
 	int saved_rowoff = E.rowoff;
 
-	char *query = prompt("(ESC to cancel) Find: %s", findCallback);
+	
+	char *query;
+	if (E.vimEmulation) {
+		query = prompt("/%s", findCallback);
+	} else {
+		query = prompt("(ESC to cancel) Find: %s", findCallback);
+	}
 
 	if (query) {
 		free(query);
@@ -154,6 +161,10 @@ void find() {
 		E.cy = saved_cy;
 		E.coloff = saved_coloff;
 		E.rowoff = saved_rowoff;
+	}
+	
+	if (VIM.mode & VIM_SEARCH_MODE) {
+		VIM.mode ^= VIM_SEARCH_MODE;
 	}
 }
 

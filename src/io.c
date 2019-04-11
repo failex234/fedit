@@ -151,7 +151,7 @@ void processKeyPress() {
 			break;
 	}
 	quit_times = FEDIT_QUIT_TIMES;
-	} else {
+	} else if (!(VIM.mode & VIM_DELETE_MODE)) {
 		switch(c) {
 			case 'i':
 				if (VIM.mode & VIM_INSERT_MODE) {
@@ -175,6 +175,14 @@ void processKeyPress() {
 					VIM.mode = VIM_INSERT_MODE;
 				}
 				break;
+			case 'd':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					VIM.mode |= VIM_DELETE_MODE;
+					setStatusMessage(-1, "--- DELETE ---");
+				}
+				break;
 			case '\x1b':
 				VIM.mode = 0;
 				setStatusMessage(0, "");
@@ -192,10 +200,16 @@ void processKeyPress() {
 					}
 				}
 				break;
+			case '/':
+				if (VIM.mode == 0) {
+					VIM.mode = VIM_SEARCH_MODE;
+					find();
+				}
+				break;
 			case BACKSPACE:
 			case CTRL_KEY('h'):
 			case DEL_KEY:
-				if (VIM.mode & VIM_INSERT_MODE) {
+				if (VIM.mode & VIM_INSERT_MODE || c == DEL_KEY) {
 					if (c == DEL_KEY) {
 						moveCursor(ARROW_RIGHT);
 					}
@@ -216,11 +230,46 @@ void processKeyPress() {
 					insertNewLine();
 				}
 				break;
+			case '\t':
+				insertChar(c);
+				break;
 			case ARROW_UP:
 			case ARROW_DOWN:
 			case ARROW_LEFT:
 			case ARROW_RIGHT:
 				moveCursor(c);
+				break;
+			case PAGE_UP:
+			case PAGE_DOWN:
+			{
+				if (c == PAGE_UP) {
+					E.cy = E.rowoff;
+
+					int times = E.screenrows;
+					while(times--) {
+						moveCursor(ARROW_UP);
+					}
+				} else if (c == PAGE_DOWN) {
+					E.cy = E.rowoff + E.screenrows - 1;
+					
+					if (E.cy > E.numrows) {
+						E.cy = E.numrows;
+					}
+					
+					int times = E.screenrows;
+					while(times--) {
+						moveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+					}
+				}
+				break;
+			}
+			case 'x':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					moveCursor(ARROW_RIGHT);
+					deleteChar();
+				}
 				break;
 			default:
 				if (iscntrl(c)) break;
@@ -228,6 +277,48 @@ void processKeyPress() {
 					insertChar(c);
 				}
 				break;
+		}
+	} else if (VIM.mode & VIM_DELETE_MODE) {
+		switch (c)
+		{
+			case '\x1b':
+				VIM.mode = 0;
+				setStatusMessage(0, "");
+				
+				if (VIM.delwords) {
+					free(VIM.delwords);
+					VIM.delwordsSize = 0;
+				}
+				break;
+			case 'd':
+				if (VIM.delwords) {
+					deleteNWords(atoi(VIM.delwords));
+					free(VIM.delwords);
+					VIM.delwordsSize = 0;
+					VIM.delwords = NULL;
+				} else {
+					deleteRow(E.cy);
+				}
+				VIM.mode = 0;
+				setStatusMessage(0, "");
+				break;
+			case 'e':
+				if (VIM.delwords) {
+					deleteNWords(atoi(VIM.delwords));
+					free(VIM.delwords);
+					VIM.delwordsSize = 0;
+					VIM.delwords = NULL;
+				} else {
+					deleteNWords(1);
+				}
+				VIM.mode = 0;
+				setStatusMessage(0, "");
+				break;
+			default:
+				if (!isdigit(c)) break;
+				addToDeleteWords(c);
+				break;
+
 		}
 	}
 

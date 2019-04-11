@@ -53,7 +53,7 @@ char *rows_to_string(int *buflen) {
 	return buf;
 }
 
-void file_save() {
+int file_save() {
 	//Check if a file is opened
 	if (E.filename == NULL) {
 		E.filename = prompt("Save as: %s", NULL);
@@ -61,7 +61,7 @@ void file_save() {
 		//User aborted file naming process by pressing ESC
 		if (E.filename == NULL) {
 			setStatusMessage(0, "Save aborted!");
-			return;
+			return 0;
 		}
 		selectSyntaxHighlight();
 	}
@@ -79,11 +79,13 @@ void file_save() {
 				E.modified = 0;
 				setStatusMessage(0, "%d bytes written to disk!", len);
 
-				return;
+				selectSyntaxHighlight();
+				return 1;
 			}
 		}
 		close(fd);
 	}
 	free(buf);
 	setStatusMessage(0, "Error while trying to save: %s", strerror(errno));
+	return 0;
 }
