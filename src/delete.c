@@ -27,7 +27,12 @@ void deleteNWords(int number) {
 			startidx = i;
 		}
 	}
-	i = ++startidx;;
+	if (E.cx) {
+		i = ++startidx;
+	} else {
+		startidx = 0;
+		i = startidx;
+	}
 	
 	while(spaces != number && i < rowSize) {
 		if (currRow[i] == ' ') {
@@ -38,7 +43,7 @@ void deleteNWords(int number) {
 	
 	endidx = i - 1;
 	
-	char *newrow = malloc(startidx + (rowSize - endidx));
+	char *newrow; = malloc(startidx + (rowSize - endidx));
 	memcpy(newrow, currRow, startidx);
 	memcpy(&newrow[startidx], &currRow[endidx + 1], rowSize - endidx - 1);
 	
