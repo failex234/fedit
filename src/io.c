@@ -276,6 +276,11 @@ void processKeyPress() {
 			case '\x1b':
 				VIM.mode = 0;
 				setStatusMessage(0, "");
+				
+				if (VIM.delwords) {
+					free(VIM.delwords);
+					VIM.delwordsSize = 0;
+				}
 				break;
 			case 'd':
 				if (VIM.delwords) {

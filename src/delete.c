@@ -4,8 +4,6 @@ void addToDeleteWords(char numAsChar) {
 	VIM.delwords = realloc(VIM.delwords, ++VIM.delwordsSize + 1);
 	VIM.delwords[VIM.delwordsSize - 1] = numAsChar;
 	VIM.delwords[VIM.delwordsSize] = '\0';
-	
-	setStatusMessage(0, "--%d-%s", VIM.delwordsSize, VIM.delwords);
 }
 
 
