@@ -1,6 +1,7 @@
 #include "fedit.h"
 
 void addToDeleteWords(char numAsChar) {
+	if (!isdigit(c)) return;
 	VIM.delwords = realloc(VIM.delwords, ++VIM.delwordsSize + 1);
 	VIM.delwords[VIM.delwordsSize - 1] = numAsChar;
 	VIM.delwords[VIM.delwordsSize] = '\0';
