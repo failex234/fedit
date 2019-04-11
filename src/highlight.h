@@ -2,7 +2,7 @@
 #define FLX_SYNHIGH_H
 #include "fedit.h"
 
-char *C_HL_extensions[] = { ".c", ".h", ".cpp", ".hpp", ".C", ".H", ".CPP" NULL};
+char *C_HL_extensions[] = { ".c", ".h", ".cpp", ".hpp", ".C", ".H", ".CPP", NULL };
 char *CS_HL_extension[] = { ".cs", ".CS", NULL };
 char *JAVA_HL_extensions[] = { ".java", ".JAVA", NULL };
 char *JAVASCRIPT_HL_extensions[] = { ".js", ".JS", NULL };
@@ -146,7 +146,7 @@ struct editorSyntax HLDB[] = {
 	 "Visual Basic",
 	 VB_HL_extensions,
 	 VB_HL_keywords,
-	 "'". NULL, NULL,
+	 "'", NULL, NULL,
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
  }
 };
