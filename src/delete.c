@@ -38,7 +38,7 @@ void deleteNWords(int number) {
 	
 	endidx = i;
 	
-	char *newrow = malloc(startidx + (rowSize - endidx))
+	char *newrow = malloc(startidx + (rowSize - endidx));
 	memcpy(newrow, currRow, startidx);
 	memcpy(&newrow[startidx], &currRow[endidx + 1], rowSize - endidx - 1);
 	
