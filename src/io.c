@@ -296,6 +296,9 @@ void processKeyPress() {
 				VIM.mode = 0;
 				setStatusMessage(0, "");
 				break;
+			case 'x':
+				deleteNWords(2);
+				break;
 			default:
 				if (!isdigit(c)) break;
 				addAsDigit(c - '0');
