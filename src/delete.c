@@ -27,7 +27,7 @@ void deleteNWords(int number) {
 			startidx = i;
 		}
 	}
-	i = startidx;
+	i = ++startidx;;
 	
 	while(spaces != number && i < rowSize) {
 		if (currRow[i] == ' ') {
