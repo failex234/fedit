@@ -3,7 +3,7 @@
 void addToDeleteWords(char numAsChar) {
 	VIM.delwords = realloc(VIM.delwords, ++VIM.delwordsSize + 1);
 	VIM.delwords[VIM.delwordsSize - 1] = numAsChar;
-	VIM.delwords[VIM.delwordSize] = '\0';
+	VIM.delwords[VIM.delwordsSize] = '\0';
 }
 
 
