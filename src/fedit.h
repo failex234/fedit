@@ -208,7 +208,7 @@ char *getCommand(char *, int);
 char *getArgument(char *);
 
 //Prototypes for delete.c
-void addToDeleteWords(int);
+void addToDeleteWords(char);
 void deleteNWords(int);
 
 #endif
