@@ -204,6 +204,8 @@ void processKeyPress() {
 				if (VIM.mode == 0) {
 					VIM.mode = VIM_SEARCH_MODE;
 					find();
+				} else if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
 				}
 				break;
 			case BACKSPACE:
