@@ -50,6 +50,8 @@ void deleteNWords(int number) {
 	newrow[startidx + rowSize - endidx - 1] = '\0';
 	
 	deleteRow(E.cy);
-	insertRow(E.cy, newrow, startidx + rowSize - endidx - 1);	
+	insertRow(E.cy, newrow, startidx + rowSize - endidx - 1);
+	
+	if (E.cx > E.row[E.cy].size) E.cx = E.row[E.cy].size - 1;
 
 }
