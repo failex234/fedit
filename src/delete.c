@@ -1,14 +1,9 @@
 #include "fedit.h"
 
-//Add each digit to the current
-//Number of to be deleted words
-//So the calucation should look
-//like this: 10 + 1 = 101
-void addAsDigit(int number) {
-    int currwords = VIM.delwords;
-    currwords *= 10 + number;
-
-    VIM.delwords = currwords;
+void addToDeleteWords(char numAsChar) {
+	delwords = realloc(delwords, ++delwordsSize + 1);
+	delwords[delwordsSize - 1] = numAsChar;
+	delwords[delwordSize] = '\0';
 }
 
 

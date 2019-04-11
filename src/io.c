@@ -279,8 +279,9 @@ void processKeyPress() {
 				break;
 			case 'd':
 				if (VIM.delwords) {
-					deleteNWords(VIM.delwords);
-					VIM.delwords = 0;
+					deleteNWords(atoi(VIM.delwords));
+					free(VIM.delwords);
+					VIM.delwordsSize = 0;
 				} else {
 					deleteRow(E.cy);
 				}
@@ -289,19 +290,18 @@ void processKeyPress() {
 				break;
 			case 'e':
 				if (VIM.delwords) {
-					deleteNWords(VIM.delwords);
+					deleteNWords(atoi(VIM.delwords));
+					free(VIM.delwords);
+					VIM.delwordsSize = 0;
 				} else {
 					deleteNWords(1);
 				}
 				VIM.mode = 0;
 				setStatusMessage(0, "");
 				break;
-			case 'x':
-				deleteNWords(2);
-				break;
 			default:
 				if (!isdigit(c)) break;
-				addAsDigit(c - '0');
+				addToDeleteWords(c);
 				break;
 
 		}

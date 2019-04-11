@@ -92,7 +92,8 @@ typedef struct textChange {
 
 typedef struct vimConfig {
 	int mode;
-	int delwords;
+	int delwordsSize;
+	char *delwords;
 	textChange *allchanges;
 } vimConfig;
 
@@ -207,7 +208,7 @@ char *getCommand(char *, int);
 char *getArgument(char *);
 
 //Prototypes for delete.c
-void addAsDigit(int);
+addToDeleteWords(int);
 void deleteNWords(int);
 
 #endif
