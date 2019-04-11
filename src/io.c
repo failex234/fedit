@@ -263,6 +263,14 @@ void processKeyPress() {
 				}
 				break;
 			}
+			case 'x':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					moveCursor(ARROW_RIGHT);
+					deleteChar();
+				}
+				break;
 			default:
 				if (iscntrl(c)) break;
 				if (VIM.mode & VIM_INSERT_MODE) {
