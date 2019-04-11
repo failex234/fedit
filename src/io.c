@@ -304,13 +304,14 @@ void processKeyPress() {
 			case 'e':
 				if (VIM.delwords) {
 					deleteNWords(atoi(VIM.delwords));
+					setStatusMessage(0, "%d--%s", VIM.delwordsSize, VIM.delwords); 
 					free(VIM.delwords);
 					VIM.delwordsSize = 0;
 				} else {
 					deleteNWords(1);
 				}
 				VIM.mode = 0;
-				setStatusMessage(0, "");
+				//setStatusMessage(0, "");
 				break;
 			default:
 				if (!isdigit(c)) break;
