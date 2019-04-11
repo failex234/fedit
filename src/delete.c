@@ -1,9 +1,9 @@
 #include "fedit.h"
 
 void addToDeleteWords(char numAsChar) {
-	delwords = realloc(delwords, ++delwordsSize + 1);
-	delwords[delwordsSize - 1] = numAsChar;
-	delwords[delwordSize] = '\0';
+	VIM.delwords = realloc(VIM.delwords, ++VIM.delwordsSize + 1);
+	VIM.delwords[VIM.delwordsSize - 1] = numAsChar;
+	VIM.delwords[VIM.delwordSize] = '\0';
 }
 
 
