@@ -312,7 +312,7 @@ void processKeyPress() {
 					deleteNWords(1);
 				}
 				VIM.mode = 0;
-				//setStatusMessage(0, "");
+				setStatusMessage(0, "");
 				break;
 			default:
 				if (!isdigit(c)) break;
