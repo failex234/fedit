@@ -209,7 +209,7 @@ void processKeyPress() {
 			case BACKSPACE:
 			case CTRL_KEY('h'):
 			case DEL_KEY:
-				if (VIM.mode & VIM_INSERT_MODE) {
+				if (VIM.mode & VIM_INSERT_MODE || c == DEL_KEY) {
 					if (c == DEL_KEY) {
 						moveCursor(ARROW_RIGHT);
 					}
