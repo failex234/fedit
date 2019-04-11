@@ -2,12 +2,13 @@
 #define FLX_SYNHIGH_H
 #include "fedit.h"
 
-char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL};
-char *CS_HL_extension[] = { ".cs", NULL };
-char *JAVA_HL_extensions[] = { ".java", NULL };
-char *JAVASCRIPT_HL_extensions[] = { ".js", NULL };
-char *PHP_HL_extensions[] = { ".php", NULL };
-char *PY_HL_extensions[] = { ".py", NULL };
+char *C_HL_extensions[] = { ".c", ".h", ".cpp", ".hpp", ".C", ".H", ".CPP" NULL};
+char *CS_HL_extension[] = { ".cs", ".CS", NULL };
+char *JAVA_HL_extensions[] = { ".java", ".JAVA", NULL };
+char *JAVASCRIPT_HL_extensions[] = { ".js", ".JS", NULL };
+char *PHP_HL_extensions[] = { ".php", ".PHP", NULL };
+char *PY_HL_extensions[] = { ".py", ".PY", NULL };
+char *VB_HL_extensions[] = { ".vb", ".vba", ".VB", ".VBA", NULL };
 
 
 char *C_HL_keywords[] = {
@@ -71,6 +72,33 @@ char *PY_HL_keywords[] = {
 	"while", "with", "yield", "True<", "False<", "None<", NULL
 };
 
+char *VB_HL_keywords[] = {
+	"AddHandler", "AddressOff", "Alias", "And", "AndAlso", "As", "Call",
+	"Case", "Catch", "Const", "Continue", "Declare", "Default", "Delegate",
+	"Dim", "DirectCast", "Do", "Each", "Else", "ElseIf", "End", "EndIf",
+	"Enum", "Erase", "Error", "Event", "Exit", "Finally", "For", "Friend",
+	"Function", "Get", "GetType", "Global", "GoSub", "GoTo", "Handles",
+	"If", "Implements", "Imports", "In", "Inherits", "Interface", "Is",
+	"IsNot", "Let", "Lib", "Like", "Loop", "Mod", "Module", "MustInherit",
+	"MustOverride", "Namespace", "Narrowing", "Next", "Not", "NotInheritable",
+	"NotOverridable", "Of", "On", "Operator", "Option", "Optional", "Or",
+	"OrElse", "Out", "Overloads", "Overridable", "Overrides", "ParamArray",
+	"Partial", "Private", "Property", "Protected", "Public", "RaiseEvent",
+	"ReadOnly", "ReDim", "REM", "RemoveHandler", "Resume", "Return", "Select",
+	"Set", "Shadows", "Shared", "Static", "Step", "Stop", "Structure", "Sub",
+	"SyncLock", "Then", "Throw", "To", "Try", "TryCast", "TypeOf", "Using",
+	"When", "While", "Widening", "With", "WithEvents", "WriteOnly", "Xor",
+	"#Const", "#Else", "#ElseIf", "#End", "#If",
+	"Byte|", "Decimal|", "Long|", "ULong|", "Integer|", "SByte|", "Boolean|",
+	"Short|", "Double|", "String|", "Variant|", "Date|", "Single|", "Object|",
+	"True<", "False<", "Nothing<", "CBool<", "CByte<", "CChar<", 
+	"CDate<", "CDbl<", "CDec<", "CInt<", "CLng<", "CObj<", "CSByte<",
+	"CShort<", "CSng<", "CStr<", "CUInt<", "CULng<", "CUShort<",
+	"Me<", "MyBase<", "MyClass<", "New<", "ByRef<", "ByVal<", NULL
+};
+	
+	
+
 struct editorSyntax HLDB[] = {
  {
 	 "C/C++",
@@ -112,6 +140,13 @@ struct editorSyntax HLDB[] = {
 	 PY_HL_extensions,
 	 PY_HL_keywords,
 	 "#", "\"\"\"", "\"\"\"",
+	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+ },
+ {
+	 "Visual Basic",
+	 VB_HL_extensions,
+	 VB_HL_keywords,
+	 "'". NULL, NULL,
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
  }
 };
