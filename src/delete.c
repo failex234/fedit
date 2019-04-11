@@ -13,6 +13,10 @@ void deleteNWords(int number) {
 	int endidx = 0;
 	int i = 0;
 	
+	if (!E.row[E.cy]) {
+		return;
+	}
+	
 	char *currRow = E.row[E.cy].chars;
 	int rowSize = E.row[E.cy].size;
 	
