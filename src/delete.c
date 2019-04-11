@@ -14,7 +14,7 @@ void deleteNWords(int number) {
 	int endidx = 0;
 	int i = 0;
 	
-	if (E.cy > E.numrows) {
+	if (E.cy > E.numrows || E.numrows == 0) {
 		return;
 	}
 	
