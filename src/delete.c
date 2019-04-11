@@ -27,6 +27,7 @@ void deleteNWords(int number) {
 			startidx = i;
 		}
 	}
+	
 	if (E.cx) {
 		i = ++startidx;
 	} else {
