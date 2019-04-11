@@ -303,10 +303,10 @@ void processKeyPress() {
 				break;
 			case 'e':
 				if (VIM.delwords) {
+					setStatusMessage(0, "%d--%s", VIM.delwordsSize, VIM.delwords); 
 					deleteNWords(atoi(VIM.delwords));
 					free(VIM.delwords);
 					VIM.delwordsSize = 0;
-					setStatusMessage(0, "%d--%s", VIM.delwordsSize, VIM.delwords); 
 				} else {
 					deleteNWords(1);
 				}
