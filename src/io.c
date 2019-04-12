@@ -114,6 +114,7 @@ void processKeyPress() {
 			deleteChar();
 			break;
 		case CTRL_KEY('d'):
+		{
 			char *str_num = prompt("Delete next %s words", NULL);
 			
 			if (str_num) {
@@ -126,6 +127,7 @@ void processKeyPress() {
 				free(str_num);
 			}
 			break;
+		}
 		case CTRL_KEY('l'):
 			deleteRow(E.cy);
 			break;
