@@ -21,7 +21,7 @@ char *C_HL_keywords[] = {
 	"uint16_t|", "uint32_t|", "uint64_t|", "uid_t|", "bool|", "wchar_t|",
 	"-><", "NULL<", "EOF<", "SEEK_SET<", "SEEK_END<", "SEEK_CUR<", "true|", "false|",
 	"errno|", "EXIT_FAILURE|", "EXIT_SUCCESS|", 
-	"stdin<", "stdout<", "stderr<"  NULL
+	"stdin<", "stdout<", "stderr<",  NULL
 };
 
 char *CS_HL_keywords[] = {
