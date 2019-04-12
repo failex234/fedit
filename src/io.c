@@ -159,7 +159,6 @@ void processKeyPress() {
 		case ARROW_RIGHT:
 			moveCursor(c);
 			break;
-		case CTRL_KEY('l'):
 		case '\x1b':
 			break;
 		default:
