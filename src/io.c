@@ -113,6 +113,22 @@ void processKeyPress() {
 			}
 			deleteChar();
 			break;
+		case CTRL_KEY('d'):
+			char *str_num = prompt("Delete next %s words", NULL);
+			
+			if (str_num) {
+				int num = atoi(str_num);
+				
+				if (num > 0) {
+					deleteNWords(num);
+				}
+				setStatusMessage(0, "");
+				free(str_num);
+			}
+			break;
+		case CTRL_KEY('l'):
+			deleteRow(E.cy);
+			break;
 		case PAGE_UP:
 		case PAGE_DOWN:
 			{
