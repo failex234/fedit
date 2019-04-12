@@ -12,10 +12,16 @@ char *VB_HL_extensions[] = { ".vb", ".vba", ".VB", ".VBA", NULL };
 
 
 char *C_HL_keywords[] = {
+	"auto", "restrict", "static", "default", "inline", "register", "sizeof",
 	"switch", "if", "while", "for", "break", "continue", "return", "else",
 	"struct", "union", "typedef", "enum", "class", "case", "volatile", "extern",
 	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|", "void|",
-	"-><", "NULL<", NULL
+	"_Bool|", "_Complex|", "_Imaginary|", "FILE|", "size_t|", "time_t|",
+	"ssize_t|", "uint|", "int8_t|", "int16_t|", "int32_t|", "int64_t|", "uint8_t|",
+	"uint16_t|", "uint32_t|", "uint64_t|", "uid_t|", "bool|", "wchar_t|",
+	"-><", "NULL<", "EOF<", "SEEK_SET<", "SEEK_END<", "SEEK_CUR<", "true|", "false|",
+	"errno|", "EXIT_FAILURE|", "EXIT_SUCCESS|", 
+	"stdin<", "stdout<", "stderr<"  NULL
 };
 
 char *CS_HL_keywords[] = {

@@ -1,6 +1,7 @@
 - Add word deletion to standard version
 - Auto indent next line when any bracket was placed and not closed in the same line
     - Multiply the indentation with the number of unclosed brackets
+- Syntax highlight format specifiers in strings
 - Add config file
 - Add more languages
 - Add word replace
