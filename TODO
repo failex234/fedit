@@ -5,4 +5,8 @@
 - Add more languages
 - Add word replace
 - Add regex replace
+- Add more vim features
+    - visual mode
+    - cli commands
+    - goto line
 - Switch to unicode
