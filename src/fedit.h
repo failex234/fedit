@@ -23,7 +23,7 @@
 #define ABUF_INIT {NULL, 0}
 #define UNUSED(x) (void)(x)
 
-#define FEDIT_VERSION "0.0.1"
+#define FEDIT_VERSION "0.0.2"
 #define FEDIT_COMPILE_DATE __DATE__
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2

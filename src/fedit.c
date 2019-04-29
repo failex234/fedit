@@ -1,8 +1,11 @@
 #include "fedit.h"
+#include "config.h"
 
 int main(int argc, char **argv) {
 	int enableVim = 0;
 	openfile = NULL;
+
+	enableVim = alwaysVim;
 	
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {

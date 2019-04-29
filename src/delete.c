@@ -10,6 +10,7 @@ void addToDeleteWords(char numAsChar) {
 
 void deleteNWords(int number) {
 	int spaces = 0;
+	int lastchar = 0;
 	int startidx = 0;
 	int endidx = 0;
 	int i = 0;
@@ -36,13 +37,14 @@ void deleteNWords(int number) {
 	}
 	
 	while(spaces != number && i < rowSize) {
-		if (currRow[i] == ' ') {
+		if (currRow[i] == ' ' || currRow[i] == '\"') {
+			lastchar = currRow[i];
 			spaces++;
 		}
 		i++;
 	}
 	
-	endidx = i - 1;
+	endidx = i - (lastchar == '\"' ? 2 : 1);
 	
 	char *newrow = malloc(startidx + (rowSize - endidx));
 	memcpy(newrow, currRow, startidx);
