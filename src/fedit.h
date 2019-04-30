@@ -206,6 +206,7 @@ void parseCommandLine(char *);
 int parseForceFlag(char *);
 char *getCommand(char *, int);
 char *getArgument(char *);
+int countChars(const char *, int, char);
 
 //Prototypes for delete.c
 void addToDeleteWords(char);

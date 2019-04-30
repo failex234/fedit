@@ -55,6 +55,19 @@ void parseCommandLine(char *command) {
 			i++;
 	    }
 
+		//Check if argument is in the expected format / doesn't contain errors
+		if ((i - 1 == strlen(cmdonly) && cmdonly[i - 2] != '/') || countChars(cmdonly, strlen(cmdonly), '/') < 3) {
+			free(find);
+			setStatusMessage(5, "Missing subsitute string!");
+
+			return;
+		} else if (strlen(find) == 0) {
+			free(find);
+			setStatusMessage(5, "Find string cannot be empty!");
+
+			return;
+		}
+
 	    int substLen = i + 1 - findLen - 5;
 	    char *subst = malloc(substLen + 1);
 
@@ -170,4 +183,16 @@ char *getArgument(char *string) {
 	
 	return newarg;
 	
+}
+
+
+int countChars(const char *string, int len, char find) {
+	int count = 0;
+
+	//Go through the string an count every encounter of the given character
+	for (int i = 0; i < len; i++) {
+		if (string[i] == find) count++;
+	}
+
+	return count;
 }
