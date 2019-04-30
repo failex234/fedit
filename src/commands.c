@@ -66,6 +66,12 @@ void parseCommandLine(char *command) {
 			setStatusMessage(5, "Find string cannot be empty!");
 
 			return;
+		} else if (countChars(cmdonly, strlen(cmdonly), '/') > 3) {
+			//TODO Ignore escaped slashes
+			free(find);
+			setStatusMessage(5, "Invalid substitute syntax!");
+
+			return;
 		}
 
 	    int substLen = i + 1 - findLen - 5;
