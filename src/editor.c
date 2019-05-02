@@ -238,3 +238,7 @@ void quit() {
 	write(STDOUT_FILENO, "\x1b[H", 3);
 	exit(0);
 }
+
+void goToLine(int line) {
+	E.cy = line - 1;
+}

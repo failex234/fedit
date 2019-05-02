@@ -35,6 +35,7 @@
 #define VIM_PROMPT_MODE (1<<1)
 #define VIM_SEARCH_MODE (1<<2)
 #define VIM_DELETE_MODE (1<<3)
+#define VIM_GOTO_MODE	(1<<4)
 
 //Editor row
 typedef struct erow {
@@ -194,6 +195,7 @@ char *prompt(char *string, void (*callback)(char *, int));
 void find();
 void findCallback(char *, int);
 void quit();
+void goToLine(int);
 
 //Prototypes for highlight.c
 void updateSyntax(erow *);

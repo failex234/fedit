@@ -170,6 +170,53 @@ void processKeyPress() {
 	quit_times = FEDIT_QUIT_TIMES;
 	} else if (!(VIM.mode & VIM_DELETE_MODE)) {
 		switch(c) {
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					addToDeleteWords(c);
+					setStatusMessage(0, "--- GOTO ---");
+				}
+				break;
+			case 'G':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					if (VIM.delwords) {
+						int num = atoi(VIM.delwords);
+						if (num > E.numrows) num = E.numrows;
+
+						goToLine(num);
+						free(VIM.delwords);
+						VIM.delwordsSize = 0;
+						VIM.delwords = NULL;
+						setStatusMessage(0, "");
+					} else {
+						goToLine(1);
+					}
+				}
+				break;	
+			case 'g':
+				if (VIM.mode & VIM_INSERT_MODE) {
+					insertChar(c);
+				} else {
+					if (VIM.mode & VIM_GOTO_MODE) {
+						goToLine(E.numrows);
+						VIM.mode = 0;
+					} else {
+						VIM.mode = VIM_GOTO_MODE;
+					}
+				}
+				break;
 			case 'i':
 				if (VIM.mode & VIM_INSERT_MODE) {
 					insertChar(c);
