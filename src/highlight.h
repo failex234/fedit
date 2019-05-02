@@ -9,6 +9,7 @@ char *JAVASCRIPT_HL_extensions[] = { ".js", ".JS", NULL };
 char *PHP_HL_extensions[] = { ".php", ".PHP", NULL };
 char *PY_HL_extensions[] = { ".py", ".PY", NULL };
 char *VB_HL_extensions[] = { ".vb", ".vba", ".VB", ".VBA", NULL };
+char *BASH_HL_extensions[] = { ".sh", NULL };
 
 
 char *C_HL_keywords[] = {
@@ -102,6 +103,15 @@ char *VB_HL_keywords[] = {
 	"CShort<", "CSng<", "CStr<", "CUInt<", "CULng<", "CUShort<",
 	"Me<", "MyBase<", "MyClass<", "New<", "ByRef<", "ByVal<", NULL
 };
+
+char *BASH_HL_keywords[] = {
+	"if", "fi", "do", "done", "for", "else", "elif", "[|", "]|", "[[|",
+	"]]|", "alias|", "read|", "echo|", "$|", "printf", "sudo", "case",
+	"in", "esac", "mount", "uname", "ls", "ps", "make", "cc", "gcc",
+	"clang", "automake", "autoconf", "umount", "cd", "pwd", "$PWD|",
+	"$@|", "$!|", "$1|", "$2|", "$3|", "$4|", "touch", "ld", "which",
+	"dir", "whoami", "$UID|", "who", "grep", "awk", "cat", "sed", NULL
+};	
 	
 	
 
@@ -154,7 +164,14 @@ struct editorSyntax HLDB[] = {
 	 VB_HL_keywords,
 	 "'", NULL, NULL,
 	 HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
- }
+ },
+ {
+	"Bash",
+	BASH_HL_extensions,
+	BASH_HL_keywords,
+	"#", NULL, NULL,
+	HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+ }	
 };
 
 
