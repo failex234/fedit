@@ -86,7 +86,7 @@ void moveCursor(int key) {
 		case ARROW_LEFT:
 			if (E.cx != 0) {
 				E.cx--;
-			} else if (E.cy > 0) {
+			} else if (E.cy > 0 && !E.vimEmulation) {
 				E.cy--;
 				E.cx = E.row[E.cy].size;
 			}
@@ -94,7 +94,7 @@ void moveCursor(int key) {
 		case ARROW_RIGHT:
 			if (row && E.cx < row->size) {
 				E.cx++;
-			} else if (row && E.cx == row->size) {
+			} else if (row && E.cx == row->size && !E.vimEmulation) {
 				E.cy++;
 				E.cx = 0;
 			}
