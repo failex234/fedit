@@ -19,8 +19,11 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 
-#define CTRL_KEY(k) ((k) & 0x1f)
-#define ABUF_INIT {NULL, 0}
+#define CTRL_KEY(k) ((k)&0x1f)
+#define ABUF_INIT \
+	{             \
+		NULL, 0   \
+	}
 #define UNUSED(x) (void)(x)
 
 #define FEDIT_VERSION "0.0.2"
@@ -28,17 +31,18 @@
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
 
-#define HL_HIGHLIGHT_NUMBERS (1<<0)
-#define HL_HIGHLIGHT_STRINGS (1<<1)
+#define HL_HIGHLIGHT_NUMBERS (1 << 0)
+#define HL_HIGHLIGHT_STRINGS (1 << 1)
 
-#define VIM_INSERT_MODE (1<<0)
-#define VIM_PROMPT_MODE (1<<1)
-#define VIM_SEARCH_MODE (1<<2)
-#define VIM_DELETE_MODE (1<<3)
-#define VIM_GOTO_MODE	(1<<4)
+#define VIM_INSERT_MODE (1 << 0)
+#define VIM_PROMPT_MODE (1 << 1)
+#define VIM_SEARCH_MODE (1 << 2)
+#define VIM_DELETE_MODE (1 << 3)
+#define VIM_GOTO_MODE (1 << 4)
 
 //Editor row
-typedef struct erow {
+typedef struct erow
+{
 	int idx;
 	int size;
 	int rsize;
@@ -48,8 +52,8 @@ typedef struct erow {
 	int hl_open_comment;
 } erow;
 
-
-struct editorConfig {
+struct editorConfig
+{
 	//Cursor position
 	int cx, cy;
 	int rx;
@@ -69,7 +73,8 @@ struct editorConfig {
 	struct termios orig_termios;
 };
 
-struct editorSyntax {
+struct editorSyntax
+{
 	char *filetype;
 	char **filematch;
 	char **keywords;
@@ -80,18 +85,21 @@ struct editorSyntax {
 };
 
 //Screen buffer
-struct abuf {
+struct abuf
+{
 	char *str_buf;
 	int len;
 };
 
-typedef struct textChange {
+typedef struct textChange
+{
 	int c;
 	int changetype;
 	int x, y;
 } textChange;
 
-typedef struct vimConfig {
+typedef struct vimConfig
+{
 	int mode;
 	int delwordsSize;
 	char *delwords;
@@ -101,9 +109,10 @@ typedef struct vimConfig {
 struct editorConfig E;
 vimConfig VIM;
 
-enum editorKey {
+enum editorKey
+{
 	BACKSPACE = 127,
-	ARROW_LEFT 	= 1000,
+	ARROW_LEFT = 1000,
 	ARROW_RIGHT,
 	ARROW_UP,
 	ARROW_DOWN,
@@ -112,10 +121,11 @@ enum editorKey {
 	END_KEY,
 	PAGE_UP,
 	PAGE_DOWN,
-	
+
 };
 
-enum editorHighlight {
+enum editorHighlight
+{
 	HL_NORMAL = 0,
 	HL_STRING,
 	HL_NUMBER,
@@ -127,7 +137,8 @@ enum editorHighlight {
 	HL_MLCOMMENT
 };
 
-enum editorChange {
+enum editorChange
+{
 	LINE_DELETE = 0,
 	LINE_ADD,
 	CHAR_DELETE,
@@ -169,7 +180,6 @@ void updateWindowSize();
 //Prototyped for appendbuffer.c
 void abAppend(struct abuf *, const char *, int);
 void abFree(struct abuf *);
-
 
 //Prototypes for file.c
 void file_open(char *);
@@ -213,5 +223,11 @@ int countChars(const char *, int, char);
 //Prototypes for delete.c
 void addToDeleteWords(char);
 void deleteNWords(int);
+
+//Prototypes for variables.c
+int check_if_var_exists();
+char *get_all_vars();
+char *get_var(char *varname);
+void set_var(char *var_name, char *var_value);
 
 #endif
