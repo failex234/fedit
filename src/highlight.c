@@ -66,15 +66,14 @@ void updateSyntax(erow *row) {
 
         //Handle quotes
         if (E.syntax->flags & HL_HIGHLIGHT_STRINGS) {
+            //Check for escpaed quotes
+            if (c == '"' && i > 0 && row->render[i - 1] == '\\') {
+                i += 2;
+                continue;
+            }
             if (in_string) {
                 row->hl[i] = HL_STRING;
 
-                //Check for escaped quotes
-                if (c == '\\' && i + 1 < row->rsize) {
-                    row->hl[i + 1] = HL_STRING;
-                    i += 2;
-                    continue;
-                }
                 if (c == in_string) {
                     in_string = 0;
                 }
