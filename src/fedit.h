@@ -31,6 +31,8 @@
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 #define HL_HIGHLIGHT_LTGT (1<<2)
+#define HL_HIGHLIGHT_TEMPLATES (1<<3)
+#define HL_HIGHLIGHT_PERCENT_FORMAT_SP (1<<4)
 
 #define VIM_INSERT_MODE (1<<0)
 #define VIM_PROMPT_MODE (1<<1)
@@ -126,7 +128,8 @@ enum editorHighlight {
     HL_KEYWORD1,
     HL_KEYWORD2,
     HL_KEYWORD3,
-    HL_MLCOMMENT
+    HL_MLCOMMENT,
+    HL_TEMPLATE_FORMAT,
 };
 
 enum editorChange {
@@ -204,7 +207,8 @@ void goToLine(int);
 void updateSyntax(erow *);
 int syntaxToColor(int);
 void selectSyntaxHighlight();
-int isSeperator(int);
+int is_seperator(int);
+int is_format_seperator(int);
 
 //Prototypes for commands.c
 void parseCommandLine(char *);

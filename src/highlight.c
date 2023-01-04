@@ -24,6 +24,8 @@ void updateSyntax(erow *row) {
     int prev_sep = 1;
     int in_string = 0;
     int in_ltgt = 0;
+    int in_templ = 0;
+    int in_format = 0;
     int in_comment = (row->idx > 0 && E.row[row->idx - 1].hl_open_comment);
 
     //Check every character
@@ -62,6 +64,37 @@ void updateSyntax(erow *row) {
                 i += mcs_len;
                 in_comment = 1;
                 continue;
+            }
+        }
+
+        //Handle string templates ("Hello $name!")
+        if (E.syntax->flags & HL_HIGHLIGHT_TEMPLATES && in_string) {
+            if (c == '$') {
+                in_templ = 1;
+                row->hl[i++] = HL_TEMPLATE_FORMAT;
+                continue;
+            } else if (in_templ && !is_seperator(c)) {
+                row->hl[i++] = HL_TEMPLATE_FORMAT;
+                if (c == '}') {
+                    in_templ = 0;
+                }
+                continue;
+            } else {
+                in_templ = 0;
+            }
+        }
+
+        //Handle format specifiers ("Hello %s!")
+        if (E.syntax->flags & HL_HIGHLIGHT_PERCENT_FORMAT_SP && in_string) {
+            if (c == '%') {
+                in_format = 1;
+                row->hl[i++] = HL_TEMPLATE_FORMAT;
+                continue;
+            } else if (in_format && !is_format_seperator(c)) {
+                row->hl[i++] = HL_TEMPLATE_FORMAT;
+                continue;
+            } else {
+                in_format = 0;
             }
         }
 
@@ -125,13 +158,13 @@ void updateSyntax(erow *row) {
         if (prev_sep) {
             int j;
             for (j = 0; keywords[j]; j++) {
-                int klen = strlen(keywords[j]);
+                size_t klen = strlen(keywords[j]);
                 int kw2 = keywords[j][klen - 1] == '|';
                 int kw3 = keywords[j][klen - 1] == '<';
 
                 if (kw2 ||kw3) klen--;
 
-                if (!strncmp(&row->render[i], keywords[j], klen) && isSeperator(row->render[i + klen])) {
+                if (!strncmp(&row->render[i], keywords[j], klen) && is_seperator(row->render[i + klen])) {
                     if (kw2) {
                         memset(&row->hl[i], HL_KEYWORD2, klen);
                     } else if (kw3) {
@@ -139,7 +172,7 @@ void updateSyntax(erow *row) {
                     } else {
                         memset(&row->hl[i], HL_KEYWORD1, klen);
                     }
-                    i += klen;
+                    i += (int) klen;
                     break;
                 }
             }
@@ -150,7 +183,7 @@ void updateSyntax(erow *row) {
 
         }
 
-        prev_sep = isSeperator(c);
+        prev_sep = is_seperator(c);
         i++;
     }
 
@@ -171,6 +204,7 @@ int syntaxToColor(int hl) {
         case HL_KEYWORD1:
             return 33;
         case HL_MATCH:
+        case HL_TEMPLATE_FORMAT:
             return 34;
         case HL_KEYWORD3:
         case HL_STRING:
@@ -219,10 +253,18 @@ void selectSyntaxHighlight() {
     }
 }
 
-int isSeperator(int c) {
+int is_seperator(int c) {
     return (
             isspace(c)  ||
             c == '\0'   ||
-            strchr(",.()+-/*=~%<>[];:", c) != NULL
+            strchr(",.()+-/*=~%<>[];:!?#\\", c) != NULL
+    );
+}
+
+int is_format_seperator(int c) {
+    return (
+            isspace(c)  ||
+            c == '\0'   ||
+            strchr(",()+-/*=~%<>[];:!?#\\", c) != NULL
     );
 }

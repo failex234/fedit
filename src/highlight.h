@@ -164,7 +164,7 @@ struct editorSyntax HLDB[] = {
                 C_HL_extensions,
                 C_HL_keywords,
                 "//", "/*", "*/",
-                HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS | HL_HIGHLIGHT_LTGT
+                HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS | HL_HIGHLIGHT_LTGT | HL_HIGHLIGHT_PERCENT_FORMAT_SP
         },
         {
                 "C#",
@@ -220,14 +220,14 @@ struct editorSyntax HLDB[] = {
                 OBJC_HL_extensions,
                 OBJC_HL_keywords,
                 "//", "/*", "*/",
-                HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS | HL_HIGHLIGHT_LTGT
+                HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS | HL_HIGHLIGHT_LTGT | HL_HIGHLIGHT_PERCENT_FORMAT_SP
         },
         {
                 "Kotlin",
                 KOT_HL_extensions,
                 KOT_HL_keywords,
                 "//", "/*", "*/",
-                HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+                HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS | HL_HIGHLIGHT_TEMPLATES
         }
 };
 
