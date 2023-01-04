@@ -23,8 +23,9 @@ void updateSyntax(erow *row) {
 
     int prev_sep = 1;
     int in_string = 0;
+    int in_ltgt = 0;
     int in_comment = (row->idx > 0 && E.row[row->idx - 1].hl_open_comment);
-    
+
     //Check every character
     int i = 0;
     while (i < row->rsize) {
@@ -91,6 +92,25 @@ void updateSyntax(erow *row) {
             }
         }
 
+        //Check for ltgt blocks (< >)
+        if (E.syntax->flags & HL_HIGHLIGHT_LTGT) {
+            if (c == '<' && !in_ltgt && !in_string && row->render[row->rsize - 1] == '>') {
+                row->hl[i] = HL_STRING;
+                in_ltgt = 1;
+                i++;
+                continue;
+            } else if (c == '>' && in_ltgt && !in_string) {
+                row->hl[i] = HL_STRING;
+                in_ltgt = 0;
+                i++;
+                continue;
+            } else if (in_ltgt) {
+                row->hl[i] = HL_STRING;
+                i++;
+                continue;
+            }
+        }
+
         //Handle numbers
         if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS) {
             if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) || (c == '.' && prev_hl == HL_NUMBER)) {
@@ -107,18 +127,18 @@ void updateSyntax(erow *row) {
             for (j = 0; keywords[j]; j++) {
                 int klen = strlen(keywords[j]);
                 int kw2 = keywords[j][klen - 1] == '|';
-				int kw3 = keywords[j][klen - 1] == '<';
+                int kw3 = keywords[j][klen - 1] == '<';
 
                 if (kw2 ||kw3) klen--;
 
                 if (!strncmp(&row->render[i], keywords[j], klen) && isSeperator(row->render[i + klen])) {
-					if (kw2) {
-						memset(&row->hl[i], HL_KEYWORD2, klen);
-					} else if (kw3) {
-						memset(&row->hl[i], HL_KEYWORD3, klen);
-					} else {
-						memset(&row->hl[i], HL_KEYWORD1, klen);
-					}
+                    if (kw2) {
+                        memset(&row->hl[i], HL_KEYWORD2, klen);
+                    } else if (kw3) {
+                        memset(&row->hl[i], HL_KEYWORD3, klen);
+                    } else {
+                        memset(&row->hl[i], HL_KEYWORD1, klen);
+                    }
                     i += klen;
                     break;
                 }
@@ -152,7 +172,7 @@ int syntaxToColor(int hl) {
             return 33;
         case HL_MATCH:
             return 34;
-		case HL_KEYWORD3:
+        case HL_KEYWORD3:
         case HL_STRING:
             return 35;
         case HL_MLCOMMENT:
@@ -185,13 +205,13 @@ void selectSyntaxHighlight() {
 
             if ((is_ext && ext && !strcmp(ext, s->filematch[i])) || (!is_ext && strstr(E.filename, s->filematch[i]))) {
                 E.syntax = s;
-				
-				int filerow;
-				
-				for (filerow = 0; filerow < E.numrows; filerow++) {
-					updateSyntax(&E.row[filerow]);
-				}
-				
+
+                int filerow;
+
+                for (filerow = 0; filerow < E.numrows; filerow++) {
+                    updateSyntax(&E.row[filerow]);
+                }
+
                 return;
             }
             i++;
@@ -201,8 +221,8 @@ void selectSyntaxHighlight() {
 
 int isSeperator(int c) {
     return (
-        isspace(c)  ||
-        c == '\0'   ||
-        strchr(",.()+-/*=~%<>[];", c) != NULL
+            isspace(c)  ||
+            c == '\0'   ||
+            strchr(",.()+-/*=~%<>[];:", c) != NULL
     );
 }

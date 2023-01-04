@@ -30,6 +30,7 @@
 
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
+#define HL_HIGHLIGHT_LTGT (1<<2)
 
 #define VIM_INSERT_MODE (1<<0)
 #define VIM_PROMPT_MODE (1<<1)
@@ -39,99 +40,100 @@
 
 //Editor row
 typedef struct erow {
-	int idx;
-	int size;
-	int rsize;
-	char *chars;
-	char *render;
-	unsigned char *hl;
-	int hl_open_comment;
+    int idx;
+    int size;
+    int rsize;
+    char *chars;
+    char *render;
+    unsigned char *hl;
+    int hl_open_comment;
 } erow;
 
 
 struct editorConfig {
-	//Cursor position
-	int cx, cy;
-	int rx;
-	int rowoff;
-	int coloff;
-	int screenrows;
-	int screencols;
-	int numrows;
-	erow *row;
-	int modified;
-	int indentNewLine;
-	int vimEmulation;
-	char *filename;
-	char statusmsg[80];
-	time_t statusmsg_time;
-	struct editorSyntax *syntax;
-	struct termios orig_termios;
+    //Cursor position
+    int cx, cy;
+    int rx;
+    int rowoff;
+    int coloff;
+    int screenrows;
+    int screencols;
+    int numrows;
+    erow *row;
+    int modified;
+    int indentNewLine;
+    int vimEmulation;
+    char *filepath;
+    char *filename;
+    char statusmsg[80];
+    time_t statusmsg_time;
+    struct editorSyntax *syntax;
+    struct termios orig_termios;
 };
 
 struct editorSyntax {
-	char *filetype;
-	char **filematch;
-	char **keywords;
-	char *singleline_comment_start;
-	char *multiline_comment_start;
-	char *multiline_comment_end;
-	int flags;
+    char *filetype;
+    char **filematch;
+    char **keywords;
+    char *singleline_comment_start;
+    char *multiline_comment_start;
+    char *multiline_comment_end;
+    int flags;
 };
 
 //Screen buffer
 struct abuf {
-	char *str_buf;
-	int len;
+    char *str_buf;
+    int len;
 };
 
 typedef struct textChange {
-	int c;
-	int changetype;
-	int x, y;
+    int c;
+    int changetype;
+    int x, y;
 } textChange;
 
 typedef struct vimConfig {
-	int mode;
-	int delwordsSize;
-	char *delwords;
-	textChange *allchanges;
+    int mode;
+    int delwordsSize;
+    char *delwords;
+    textChange *allchanges;
 } vimConfig;
 
 struct editorConfig E;
 vimConfig VIM;
 
 enum editorKey {
-	BACKSPACE = 127,
-	ARROW_LEFT 	= 1000,
-	ARROW_RIGHT,
-	ARROW_UP,
-	ARROW_DOWN,
-	DEL_KEY,
-	HOME_KEY,
-	END_KEY,
-	PAGE_UP,
-	PAGE_DOWN,
-	
+    BACKSPACE = 127,
+    ARROW_LEFT 	= 1000,
+    ARROW_RIGHT,
+    ARROW_UP,
+    ARROW_DOWN,
+    DEL_KEY,
+    HOME_KEY,
+    END_KEY,
+    PAGE_UP,
+    PAGE_DOWN,
+
 };
 
 enum editorHighlight {
-	HL_NORMAL = 0,
-	HL_STRING,
-	HL_NUMBER,
-	HL_MATCH,
-	HL_COMMENT,
-	HL_KEYWORD1,
-	HL_KEYWORD2,
-	HL_KEYWORD3,
-	HL_MLCOMMENT
+    HL_NORMAL = 0,
+    HL_STRING,
+    HL_NUMBER,
+    HL_MATCH,
+    HL_COMMENT,
+    HL_KEYWORD1,
+    HL_KEYWORD2,
+    HL_KEYWORD3,
+    HL_MLCOMMENT
 };
 
 enum editorChange {
-	LINE_DELETE = 0,
-	LINE_ADD,
-	CHAR_DELETE,
-	CHAR_ADD
+    LINE_DELETE = 0,
+    LINE_ADD,
+    CHAR_DELETE,
+    CHAR_ADD
 };
 
 char welcome[80];
@@ -158,7 +160,7 @@ void handleSigWinch(int);
 
 //Prototypes for terminal.c
 void refreshScreen();
-void drawRows();
+void drawRows(struct abuf *ab);
 void scroll();
 void drawStatusBar(struct abuf *);
 void drawMessageBar(struct abuf *);
@@ -175,6 +177,7 @@ void abFree(struct abuf *);
 void file_open(char *);
 int file_save();
 char *rows_to_string(int *);
+void set_file(const char *);
 
 //Prototypes for rows.c
 void insertRow(int, char *, size_t);
