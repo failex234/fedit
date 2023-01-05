@@ -10,5 +10,5 @@ FetchContent_MakeAvailable(cmake_git_version_tracking)
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DENABLE_DEV")
 
-add_executable(fedit src/fedit.h src/appendbuffer.c src/commands.c src/config.h src/delete.c src/editor.c src/errorhandling.c src/file.c src/highlight.h src/io.c src/rows.c src/terminal.c src/terminalmode.c src/highlight.c src/fedit.c)
+add_executable(fedit src/fedit.h src/appendbuffer.c src/commands.c src/config.h src/delete.c src/editor.c src/errorhandling.c src/file.c src/highlight.h src/io.c src/rows.c src/terminal.c src/terminalmode.c src/highlight.c src/fedit.c src/signalhandler.c)
 target_link_libraries(fedit cmake_git_version_tracking)

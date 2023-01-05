@@ -1,6 +1,6 @@
 #include "highlight.h"
 
-void updateSyntax(erow *row) {
+void updateSyntax(struct erow *row) {
     //Rellocate / allocate space for the line
     row->highlight_types = realloc(row->highlight_types, row->render_length);
 

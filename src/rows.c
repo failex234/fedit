@@ -4,8 +4,8 @@ void insertRow(int at, char *s, size_t len) {
         return;
     }
 
-    editorState.rows = realloc(editorState.rows, sizeof(erow) * (editorState.numrows + 1));
-    memmove(&editorState.rows[at + 1], &editorState.rows[at], sizeof(erow) * (editorState.numrows - at));
+    editorState.rows = realloc(editorState.rows, sizeof(struct erow) * (editorState.numrows + 1));
+    memmove(&editorState.rows[at + 1], &editorState.rows[at], sizeof(struct erow) * (editorState.numrows - at));
 
     for (int i = at + 1; i <= editorState.numrows; i++) {
         editorState.rows[i].idx++;
@@ -36,7 +36,7 @@ void insertRow(int at, char *s, size_t len) {
 
 //Replaces Tabs with 8 spaces to prevent "ghosting" of characters
 //And also update the current rows
-void updateRow(erow *row) {
+void updateRow(struct erow *row) {
     int tabs = 0;
 
     //Count the number of tabs
@@ -72,7 +72,7 @@ void updateRow(erow *row) {
     updateSyntax(row);
 }
 
-int rowCxToRx(erow *row, int cx) {
+int rowCxToRx(struct erow *row, int cx) {
     int rx = 0;
 
     for (int i = 0; i < cx; i++) {
@@ -88,7 +88,7 @@ int rowCxToRx(erow *row, int cx) {
     return rx;
 }
 
-int rowRxToCx(erow *row, int rx) {
+int rowRxToCx(struct erow *row, int rx) {
     int cur_rx = 0;
 
     int cx;
@@ -106,7 +106,7 @@ int rowRxToCx(erow *row, int rx) {
     return cx;
 }
 
-void rowInsertChar(erow *row, int at, int c) {
+void rowInsertChar(struct erow *row, int at, int c) {
     if (at < 0 || at > row->length) {
         at = row->length;
     }
@@ -123,7 +123,7 @@ void rowInsertChar(erow *row, int at, int c) {
     editorState.modified++;
 }
 
-void rowDeleteChar(erow *row, int at) {
+void rowDeleteChar(struct erow *row, int at) {
     if (at < 0 || at >= row->length) {
         return;
     }
@@ -137,7 +137,7 @@ void rowDeleteChar(erow *row, int at) {
     editorState.modified++;
 }
 
-void rowAppendString(erow *row, char *string, size_t len) {
+void rowAppendString(struct erow *row, char *string, size_t len) {
     //Reallocate space for the current rows + the new string
     row->chars = realloc(row->chars, row->length + len + 1);
     memcpy(&row->chars[row->length], string, len);
@@ -151,7 +151,7 @@ void rowAppendString(erow *row, char *string, size_t len) {
     editorState.modified++;
 }
 
-void freeRow(erow *row) {
+void freeRow(struct erow *row) {
     free(row->render);
     free(row->chars);
     free(row->highlight_types);
@@ -164,7 +164,7 @@ void deleteRow(int at) {
 
     //Free the space of the rows
     freeRow(&editorState.rows[at]);
-    memmove(&editorState.rows[at], &editorState.rows[at + 1], sizeof(erow) * (editorState.numrows - at - 1));
+    memmove(&editorState.rows[at], &editorState.rows[at + 1], sizeof(struct erow) * (editorState.numrows - at - 1));
 
     for (int i = at; i < editorState.numrows - 1; i++) {
         editorState.rows[i].idx--;

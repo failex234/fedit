@@ -78,13 +78,13 @@ void init() {
         die("getWindowSize");
     }
 
-    signal(SIGWINCH, handleSigWinch);
+    signal(SIGWINCH, handle_SIGWINCH);
 
     editorState.screenrows -= 2;
 }
 
 void moveCursor(int key) {
-    erow *row = (editorState.cursor_y >= editorState.numrows) ? NULL : &editorState.rows[editorState.cursor_y];
+    struct erow *row = (editorState.cursor_y >= editorState.numrows) ? NULL : &editorState.rows[editorState.cursor_y];
     switch(key) {
         case ARROW_LEFT:
             if (editorState.cursor_x != 0) {
@@ -150,7 +150,7 @@ void showVersion(const char *prgname) {
     char *commit_hash = (char*) malloc(sizeof(char)*7);
     memcpy(commit_hash, git_CommitSHA1(), 6);
     commit_hash[6] = '\0';
-    printf("%s development version (compiled on %s)\nCommit Hash: %s\nUncommitted Changes: %s\n", prgname, FEDIT_COMPILE_DATE, commit_hash, git_AnyUncommittedChanges() ? "YES" : "NO");
+    printf("%s development version (compiled on %s)\nCommit Hash: %s%s\n", prgname, FEDIT_COMPILE_DATE, commit_hash, git_AnyUncommittedChanges() ? " + uncommitted changes" : "");
 #else
     printf("%s version %s (compiled on %s)\n", prgname, FEDIT_VERSION, FEDIT_COMPILE_DATE);
 #endif

@@ -19,7 +19,7 @@ void deleteChar() {
         return;
     }
 
-    erow *row = &editorState.rows[editorState.cursor_y];
+    struct erow *row = &editorState.rows[editorState.cursor_y];
     if (editorState.cursor_x > 0) {
         rowDeleteChar(row, editorState.cursor_x - 1);
         editorState.cursor_x--;
@@ -39,7 +39,7 @@ void insertNewLine() {
         //insert a blank line when we're at the beginning of a line
         insertRow(editorState.cursor_y, "", 0);
     } else {
-        erow *row = &editorState.rows[editorState.cursor_y];
+        struct erow *row = &editorState.rows[editorState.cursor_y];
 
         insertRow(editorState.cursor_y + 1, &row->chars[editorState.cursor_x], row->length - editorState.cursor_x);
 
@@ -208,7 +208,7 @@ void findCallback(char *query, int key) {
             current = 0;
         }
 
-        erow *row = &editorState.rows[current];
+        struct erow *row = &editorState.rows[current];
 
         char *match = strstr(row->render, query);
 

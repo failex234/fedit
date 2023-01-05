@@ -19,17 +19,19 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 
+#include "signalhandler.h"
+
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define ABUF_INIT {NULL, 0}
 #define UNUSED(x) (void)(x)
 
 #define FEDIT_VERSION "0.0.3"
-#define FEDIT_COMPILE_DATE __DATE__
+#define FEDIT_COMPILE_DATE __TIMESTAMP__
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
 
 ///Abstract representation of a rows in the editor
-typedef struct erow {
+struct erow {
     ///Rows index in the whole file
     int idx;
     ///Character length of the row
@@ -44,7 +46,7 @@ typedef struct erow {
     unsigned char *highlight_types;
     ///This line is part of a comment
     int hl_open_comment;
-} erow;
+};
 
 ///The current editors state
 struct editorState {
@@ -67,7 +69,7 @@ struct editorState {
     ///Disable line numbering
     int disable_linenums;
     ///Text rows representing the contents of the opened file
-    erow *rows;
+    struct erow *rows;
     ///Whether the file was modified
     int modified;
     ///Indent the next new line with n-tabs
@@ -201,7 +203,6 @@ void die(const char *);
 //Prototypes for io.c
 int readKey();
 void processKeyPress();
-void handleSigWinch(int);
 
 //Prototypes for terminal.c
 void refreshScreen();
@@ -227,13 +228,13 @@ void set_file(const char *);
 
 //Prototypes for rows.c
 void insertRow(int, char *, size_t);
-void updateRow(erow *row);
-void rowInsertChar(erow *, int, int);
-void rowDeleteChar(erow *, int);
-void rowAppendString(erow *, char *, size_t);
-int rowCxToRx(erow *, int);
-int rowRxToCx(erow *, int);
-void freeRow(erow *);
+void updateRow(struct erow *row);
+void rowInsertChar(struct erow *, int, int);
+void rowDeleteChar(struct erow *, int);
+void rowAppendString(struct erow *, char *, size_t);
+int rowCxToRx(struct erow *, int);
+int rowRxToCx(struct erow *, int);
+void freeRow(struct erow *);
 void deleteRow(int);
 
 //Prototypes for editor.c
@@ -247,7 +248,7 @@ void quit();
 void goToLine(int);
 
 //Prototypes for highlight.c
-void updateSyntax(erow *);
+void updateSyntax(struct erow *);
 int syntaxToColor(int);
 void determineSyntaxHighlight();
 void forceSyntaxHighlighting(int, struct editorSyntax*);
