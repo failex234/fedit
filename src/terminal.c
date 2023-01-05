@@ -1,10 +1,31 @@
-#include "fedit.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "terminal_io.h"
+
+void abAppend(struct screen_buffer *ab, const char *s, int len) {
+    //Reallocate memory for the new string that should get appended
+    char *new = realloc(ab->str_buf, ab->len + len);
+    if (new == NULL) return;
+
+    //Copy the new string behind the "old" string
+    memcpy(&new[ab->len], s, len);
+
+    //Update the struct
+    ab->str_buf = new;
+    ab->len += len;
+}
+void abFree(struct screen_buffer *ab) {
+    free(ab->str_buf);
+}
 
 //Clear the screen, draw the rows and position the cursor at the top-left
 void refreshScreen() {
     scroll();
 
-    struct screen_buffer ab = ABUF_INIT;
+    struct screen_buffer ab = SCREENBUF_INIT;
 
     //Hide the cursor so no "flickering" can occur (Set Mode)
     abAppend(&ab, "\x1b[?25l", 6);
