@@ -1,4 +1,12 @@
-#include "fedit.h"
+#include <stdlib.h>
+#include <string.h>
+
+
+#include "commands.h"
+#include "editor.h"
+#include "file.h"
+#include "highlighting.h"
+#include "terminal.h"
 
 void parseCommandLine(char *command) {
     int hasForceFlag = parseForceFlag(command);

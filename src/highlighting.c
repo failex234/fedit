@@ -1,4 +1,11 @@
-#include "highlight.h"
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "editor.h"
+#include "highlighting.h"
+#include "rows.h"
+#include "terminal.h"
 
 void updateSyntax(struct erow *row) {
     //Rellocate / allocate space for the line

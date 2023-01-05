@@ -1,9 +1,16 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "terminal_io.h"
+#include "editor.h"
+#include "error.h"
+#include "fedit.h"
+#include "highlighting.h"
+#include "rows.h"
+#include "terminal.h"
 
 void abAppend(struct screen_buffer *ab, const char *s, int len) {
     //Reallocate memory for the new string that should get appended

@@ -1,4 +1,15 @@
-#include "fedit.h"
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "editor.h"
+#include "file.h"
+#include "highlighting.h"
+#include "rows.h"
+
 void file_open(char *filename) {
     free(editorState.filepath);
     //TODO: replaced

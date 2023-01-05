@@ -1,6 +1,6 @@
-#include "fedit.h"
-#include <execinfo.h>
-
+#include "editor.h"
+#include "signal.h"
+#include "terminal.h"
 
 void handle_SIGWINCH(int signal) {
     UNUSED(signal);

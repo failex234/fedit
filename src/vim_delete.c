@@ -1,4 +1,9 @@
-#include "fedit.h"
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "editor.h"
+#include "rows.h"
 
 void addToDeleteWords(char numAsChar) {
     if (!isdigit(numAsChar)) return;

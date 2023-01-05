@@ -1,4 +1,13 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "editor.h"
 #include "fedit.h"
+#include "highlighting.h"
+#include "rows.h"
+#include "terminal.h"
+
 void insertRow(int at, char *s, size_t len) {
     if (at < 0 || at > editorState.numrows) {
         return;

@@ -1,4 +1,6 @@
-#include "fedit.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 void die(const char *string) {
     //Erase display (Erase In Display)

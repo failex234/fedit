@@ -1,6 +1,18 @@
-#include "fedit.h"
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "config.h"
+#include "editor.h"
+#include "error.h"
+#include "fedit.h"
+#include "file.h"
 #include "git.h"
+#include "rows.h"
+#include "signal.h"
+#include "terminal.h"
+#include "terminal_io.h"
 
 int main(int argc, char **argv) {
     int enableVim = 0;
@@ -81,60 +93,6 @@ void init() {
     signal(SIGWINCH, handle_SIGWINCH);
 
     editorState.screenrows -= 2;
-}
-
-void moveCursor(int key) {
-    struct erow *row = (editorState.cursor_y >= editorState.numrows) ? NULL : &editorState.rows[editorState.cursor_y];
-    switch(key) {
-        case ARROW_LEFT:
-            if (editorState.cursor_x != 0) {
-                editorState.cursor_x--;
-            } else if (editorState.cursor_y > 0 && !editorState.vim_emulation) {
-                editorState.cursor_y--;
-                editorState.cursor_x = editorState.rows[editorState.cursor_y].length;
-            }
-            break;
-        case ARROW_RIGHT:
-            if (row && editorState.cursor_x < row->length) {
-                editorState.cursor_x++;
-            } else if (row && editorState.cursor_x == row->length && !editorState.vim_emulation) {
-                editorState.cursor_y++;
-                editorState.cursor_x = 0;
-            }
-            break;
-        case ARROW_UP:
-            if (editorState.cursor_y != 0) {
-                editorState.cursor_y--;
-            }
-            break;
-        case ARROW_DOWN:
-            if (editorState.cursor_y < editorState.numrows) {
-                editorState.cursor_y++;
-            }
-            break;
-    }
-
-    row = (editorState.cursor_y >= editorState.numrows) ? NULL : &editorState.rows[editorState.cursor_y];
-    int rowlen = row ? row->length : 0;
-
-    if (editorState.cursor_x > rowlen) {
-        editorState.cursor_x = rowlen;
-    }
-}
-
-void setStatusMessage(int timeout, const char *format, ...) {
-    va_list ap;
-    va_start(ap, format);
-
-    vsnprintf(editorState.statusmsg, sizeof(editorState.statusmsg), format, ap);
-
-    va_end(ap);
-
-    if (timeout >= 0) {
-        editorState.statusmsg_time = time(NULL) + timeout;
-    } else {
-        editorState.statusmsg_time = time(NULL) + 36000;
-    }
 }
 
 void showHelp(const char *prgname) {

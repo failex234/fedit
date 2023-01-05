@@ -1,13 +1,8 @@
-//
-//  handlers.h
-//  feditcmake
-//
-//  Created by Felix Naumann on 05.01.23.
-//
-
 #ifndef handlers_h
 #define handlers_h
 
+#define UNUSED(x) (void)(x)
 
+void handle_SIGWINCH(int signal);
 
 #endif /* handlers_h */
