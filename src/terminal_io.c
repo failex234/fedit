@@ -271,7 +271,7 @@ void processKeyPress() {
                     char *cmd = prompt(":%s", NULL);
 
                     if (cmd) {
-                        parseCommandLine(cmd);
+                        parse_command_prompt(cmd);
                     } else {
                         setStatusMessage(0, "");
                     }

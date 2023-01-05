@@ -10,10 +10,4 @@
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
 
-
-void init();
-void showHelp(const char *);
-void showVersion(const char *);
-
-
 #endif

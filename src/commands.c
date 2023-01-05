@@ -8,10 +8,10 @@
 #include "highlighting.h"
 #include "terminal.h"
 
-void parseCommandLine(char *command) {
-    int hasForceFlag = parseForceFlag(command);
-    char *cmdonly = getCommand(command, hasForceFlag);
-    char *argument = getArgument(command);
+void parse_command_prompt(char *prompt) {
+    int hasForceFlag = find_force_flag(prompt);
+    char *cmdonly = get_command(prompt, hasForceFlag);
+    char *argument = getArgument(prompt);
 
     if (cmdonly) {
         if (!strcmp(cmdonly, "w")) {
@@ -70,7 +70,7 @@ void parseCommandLine(char *command) {
             }
 
             //Check if argument is in the expected format / doesn't contain errors
-            if ((i - 1 == strlen(cmdonly) && cmdonly[i - 2] != '/') || countChars(cmdonly, strlen(cmdonly), '/') < 3) {
+            if ((i - 1 == strlen(cmdonly) && cmdonly[i - 2] != '/') || count_chars(cmdonly, strlen(cmdonly), '/') < 3) {
                 free(find);
                 setStatusMessage(5, "Missing subsitute string!");
 
@@ -80,7 +80,7 @@ void parseCommandLine(char *command) {
                 setStatusMessage(5, "Find string cannot be empty!");
 
                 return;
-            } else if (countChars(cmdonly, strlen(cmdonly), '/') > 3) {
+            } else if (count_chars(cmdonly, strlen(cmdonly), '/') > 3) {
                 //TODO Ignore escaped slashes
                 free(find);
                 setStatusMessage(5, "Invalid substitute syntax!");
@@ -156,13 +156,13 @@ void parseCommandLine(char *command) {
             setStatusMessage(0, "Command not recognized");
         }
 
-        free(command);
+        free(prompt);
     } else {
         setStatusMessage(0, "Command not recognized %s");
     }
 }
 
-int parseForceFlag(char *string) {
+int find_force_flag(char *string) {
     int sepfound = 0;
     int idx = 0;
 
@@ -179,7 +179,7 @@ int parseForceFlag(char *string) {
     return idx;
 }
 
-char *getCommand(char *string, int hasForce) {
+char *get_command(char *string, int hasForce) {
     char *command;
     char splitchar;
     uint len = strlen(string);
@@ -242,7 +242,7 @@ char *getArgument(char *string) {
 }
 
 
-int countChars(const char *string, int len, char find) {
+int count_chars(const char *string, int len, char find) {
     int count = 0;
 
     //Go through the string an count every encounter of the given character
