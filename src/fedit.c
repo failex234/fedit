@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv) {
     int enableVim = 0;
-    openfile = NULL;
+    cmdline_openfile = NULL;
 
     enableVim = alwaysVim;
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
                 return 1;
             } else {
-                openfile = argv[i];
+                cmdline_openfile = argv[i];
                 break;
             }
         }
@@ -34,13 +34,13 @@ int main(int argc, char **argv) {
     init();
 
     if (enableVim) {
-        E.vimEmulation = 1;
+        editorState.vim_emulation = 1;
     } else {
         setStatusMessage(0, "HELP: Ctrl+S = save | Ctrl+Q = quit | Ctrl+F = find | Ctrl+D = delete | Ctrl+L = del line");
     }
 
-    if (openfile) {
-        file_open(openfile);
+    if (cmdline_openfile) {
+        file_open(cmdline_openfile);
     }
 
     while (1) {
@@ -52,73 +52,73 @@ int main(int argc, char **argv) {
 
 void init() {
     //Set initial values
-    E.cx = 0;
-    E.cy = 0;
-    E.rx = 0;
-    E.rowoff = 0;
-    E.coloff = 0;
-    E.numrows = 0;
-    E.disable_highlight = 0;
-    E.row = NULL;
-    E.modified = 0;
-    E.filepath = NULL;
-    E.filename = NULL;
-    E.statusmsg[0] = '\0';
-    E.statusmsg_time = 0;
-    E.syntax = NULL;
-    E.indentNewLine = 0;
-    E.vimEmulation = 0;
+    editorState.cursor_x = 0;
+    editorState.cursor_y = 0;
+    editorState.cursor_rendered_x = 0;
+    editorState.rowoff = 0;
+    editorState.coloff = 0;
+    editorState.numrows = 0;
+    editorState.disable_highlight = 0;
+    editorState.disable_linenums = 0;
+    editorState.rows = NULL;
+    editorState.modified = 0;
+    editorState.filepath = NULL;
+    editorState.filename = NULL;
+    editorState.statusmsg[0] = '\0';
+    editorState.statusmsg_time = 0;
+    editorState.syntax = NULL;
+    editorState.indent_newline = 0;
+    editorState.vim_emulation = 0;
 
-    VIM.mode = 0;
-    VIM.delwordsSize = 0;
-    VIM.delwords = NULL;
-    VIM.allchanges = NULL;
+    vimState.mode = 0;
+    vimState.numinput_buffer_len = 0;
+    vimState.numinput_buffer = NULL;
 
-    if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
+    if (getWindowSize(&editorState.screenrows, &editorState.screencols) == -1) {
         die("getWindowSize");
     }
 
     signal(SIGWINCH, handleSigWinch);
 
-    E.screenrows -= 2;
+    editorState.screenrows -= 2;
 }
 
 void moveCursor(int key) {
-    erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+    erow *row = (editorState.cursor_y >= editorState.numrows) ? NULL : &editorState.rows[editorState.cursor_y];
     switch(key) {
         case ARROW_LEFT:
-            if (E.cx != 0) {
-                E.cx--;
-            } else if (E.cy > 0 && !E.vimEmulation) {
-                E.cy--;
-                E.cx = E.row[E.cy].size;
+            if (editorState.cursor_x != 0) {
+                editorState.cursor_x--;
+            } else if (editorState.cursor_y > 0 && !editorState.vim_emulation) {
+                editorState.cursor_y--;
+                editorState.cursor_x = editorState.rows[editorState.cursor_y].length;
             }
             break;
         case ARROW_RIGHT:
-            if (row && E.cx < row->size) {
-                E.cx++;
-            } else if (row && E.cx == row->size && !E.vimEmulation) {
-                E.cy++;
-                E.cx = 0;
+            if (row && editorState.cursor_x < row->length) {
+                editorState.cursor_x++;
+            } else if (row && editorState.cursor_x == row->length && !editorState.vim_emulation) {
+                editorState.cursor_y++;
+                editorState.cursor_x = 0;
             }
             break;
         case ARROW_UP:
-            if (E.cy != 0) {
-                E.cy--;
+            if (editorState.cursor_y != 0) {
+                editorState.cursor_y--;
             }
             break;
         case ARROW_DOWN:
-            if (E.cy < E.numrows) {
-                E.cy++;
+            if (editorState.cursor_y < editorState.numrows) {
+                editorState.cursor_y++;
             }
             break;
     }
 
-    row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
-    int rowlen = row ? row->size : 0;
+    row = (editorState.cursor_y >= editorState.numrows) ? NULL : &editorState.rows[editorState.cursor_y];
+    int rowlen = row ? row->length : 0;
 
-    if (E.cx > rowlen) {
-        E.cx = rowlen;
+    if (editorState.cursor_x > rowlen) {
+        editorState.cursor_x = rowlen;
     }
 }
 
@@ -126,14 +126,14 @@ void setStatusMessage(int timeout, const char *format, ...) {
     va_list ap;
     va_start(ap, format);
 
-    vsnprintf(E.statusmsg, sizeof(E.statusmsg), format, ap);
+    vsnprintf(editorState.statusmsg, sizeof(editorState.statusmsg), format, ap);
 
     va_end(ap);
 
     if (timeout >= 0) {
-        E.statusmsg_time = time(NULL) + timeout;
+        editorState.statusmsg_time = time(NULL) + timeout;
     } else {
-        E.statusmsg_time = time(NULL) + 36000;
+        editorState.statusmsg_time = time(NULL) + 36000;
     }
 }
 

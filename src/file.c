@@ -1,6 +1,6 @@
 #include "fedit.h"
 void file_open(char *filename) {
-    free(E.filepath);
+    free(editorState.filepath);
     //TODO: replaced
     set_file(strdup(filename));
 
@@ -24,18 +24,18 @@ void file_open(char *filename) {
             linelen--;
         }
         //Add line to current editor rows
-        insertRow(E.numrows, line, linelen);
+        insertRow(editorState.numrows, line, linelen);
     }
     free(line);
     fclose(fp);
-    E.modified = 0;
+    editorState.modified = 0;
 }
 
 char *rows_to_string(int *buflen) {
     int totlen = 0;
 
-    for (int i = 0; i < E.numrows; i++) {
-        totlen += E.row[i].size + 1;
+    for (int i = 0; i < editorState.numrows; i++) {
+        totlen += editorState.rows[i].length + 1;
     }
 
     *buflen = totlen;
@@ -43,9 +43,9 @@ char *rows_to_string(int *buflen) {
     char *buf = malloc(totlen);
     char *p = buf;
 
-    for (int i = 0; i < E.numrows; i++) {
-        memcpy(p, E.row[i].chars, E.row[i].size);
-        p += E.row[i].size;
+    for (int i = 0; i < editorState.numrows; i++) {
+        memcpy(p, editorState.rows[i].chars, editorState.rows[i].length);
+        p += editorState.rows[i].length;
 
         *p = '\n';
         p++;
@@ -56,12 +56,12 @@ char *rows_to_string(int *buflen) {
 
 int file_save() {
     //Check if a file is opened
-    if (E.filepath == NULL) {
+    if (editorState.filepath == NULL) {
         //TODO: replaced
         set_file(prompt("Save as: %s", NULL));
 
         //User aborted file naming process by pressing ESC
-        if (E.filepath == NULL) {
+        if (editorState.filepath == NULL) {
             setStatusMessage(0, "Save aborted!");
             return 0;
         }
@@ -71,14 +71,14 @@ int file_save() {
     int len;
     char *buf = rows_to_string(&len);
 
-    int fd = open(E.filepath, O_RDWR | O_CREAT, 0644);
+    int fd = open(editorState.filepath, O_RDWR | O_CREAT, 0644);
     if (fd != -1) {
         if (ftruncate(fd, len) != -1) {
             if (write(fd, buf, len) == len) {
                 close(fd);
                 free(buf);
 
-                E.modified = 0;
+                editorState.modified = 0;
                 setStatusMessage(0, "%d bytes written to disk!", len);
 
                 determineSyntaxHighlight();
@@ -95,11 +95,11 @@ int file_save() {
 void set_file(const char *filepath) {
     int is_path = (strchr(filepath, '/') != NULL);
 
-    E.filepath = (char*) filepath;
+    editorState.filepath = (char*) filepath;
 
     //When the filepath is not a path (does not contain any slashes) we can set the filename to the same value
     if (!is_path) {
-        E.filename = (char*) filepath;
+        editorState.filename = (char*) filepath;
     } else {
         //When the filepath is actually a path we need to extract the filename
         char *last_slash = strrchr(filepath, '/');
@@ -107,7 +107,7 @@ void set_file(const char *filepath) {
         //Directly include a place for NULL in the length
         size_t filename_len = filepath_len - (last_slash - filepath);
 
-        E.filename = (char*) malloc(filename_len);
-        memcpy(E.filename, last_slash+1, filename_len);
+        editorState.filename = (char*) malloc(filename_len);
+        memcpy(editorState.filename, last_slash + 1, filename_len);
     }
 }

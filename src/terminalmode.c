@@ -5,13 +5,13 @@ void enableRawMode() {
 
     //Get the current teminal mode and attributes and save them in the struct orig_termios
     //Also tell the library to call disableRawMode on exit (atexit)
-    if (tcgetattr(0, &E.orig_termios) == -1) {
+    if (tcgetattr(0, &editorState.orig_termios) == -1) {
         die("tcsetattr");
     }
     atexit(disableRawMode);
 
     //Create a new temporary new struct to set the new flags
-    struct termios raw = E.orig_termios;
+    struct termios raw = editorState.orig_termios;
 
     //Disable Ctrl+Q (XON) and Ctrl+S (XOFF) (Both are used for software control flow)
     //They are unneeded for today's computers
@@ -24,7 +24,7 @@ void enableRawMode() {
     //Disable the terminal translation from \n to \r\n
     raw.c_oflag &= ~(OPOST);
 
-    //Set the character size to 8 bits per byte (CS8)
+    //Set the character length to 8 bits per byte (CS8)
     raw.c_cflag |= (CS8);
 
     //Disable echo flag (So that the typed character will NOT be echoed back) (ECHO)
@@ -52,7 +52,7 @@ void enableRawMode() {
 //Restore the "original" terminal mode
 void disableRawMode() {
     //try restore the original mode
-    if (tcsetattr(0, TCSAFLUSH, &E.orig_termios) == -1) {
+    if (tcsetattr(0, TCSAFLUSH, &editorState.orig_termios) == -1) {
         die("tcsetattr");
     }
 }

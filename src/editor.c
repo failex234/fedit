@@ -1,70 +1,70 @@
 #include "fedit.h"
 void insertChar(int c) {
-    if (E.cy == E.numrows) {
-        insertRow(E.numrows, "", 0);
+    if (editorState.cursor_y == editorState.numrows) {
+        insertRow(editorState.numrows, "", 0);
     }
 
     if (c == '{') {
-        E.indentNewLine++;
-    } else if (c == '}' && E.indentNewLine != 0) {
-        E.indentNewLine--;
+        editorState.indent_newline++;
+    } else if (c == '}' && editorState.indent_newline != 0) {
+        editorState.indent_newline--;
     }
 
-    rowInsertChar(&E.row[E.cy], E.cx, c);
-    E.cx++;
+    rowInsertChar(&editorState.rows[editorState.cursor_y], editorState.cursor_x, c);
+    editorState.cursor_x++;
 }
 
 void deleteChar() {
-    if (E.cy == E.numrows || (E.cx == 0 && E.cy == 0)) {
+    if (editorState.cursor_y == editorState.numrows || (editorState.cursor_x == 0 && editorState.cursor_y == 0)) {
         return;
     }
 
-    erow *row = &E.row[E.cy];
-    if (E.cx > 0) {
-        rowDeleteChar(row, E.cx - 1);
-        E.cx--;
+    erow *row = &editorState.rows[editorState.cursor_y];
+    if (editorState.cursor_x > 0) {
+        rowDeleteChar(row, editorState.cursor_x - 1);
+        editorState.cursor_x--;
     } else {
         //Append the text of the current line to the line above and then delete the current line
-        E.cx = E.row[E.cy - 1].size;
+        editorState.cursor_x = editorState.rows[editorState.cursor_y - 1].length;
 
-        rowAppendString(&E.row[E.cy - 1], row->chars, row->size);
-        deleteRow(E.cy);
+        rowAppendString(&editorState.rows[editorState.cursor_y - 1], row->chars, row->length);
+        deleteRow(editorState.cursor_y);
 
-        E.cy--;
+        editorState.cursor_y--;
     }
 }
 
 void insertNewLine() {
-    if (E.cx == 0) {
+    if (editorState.cursor_x == 0) {
         //insert a blank line when we're at the beginning of a line
-        insertRow(E.cy, "", 0);
+        insertRow(editorState.cursor_y, "", 0);
     } else {
-        erow *row = &E.row[E.cy];
+        erow *row = &editorState.rows[editorState.cursor_y];
 
-        insertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
+        insertRow(editorState.cursor_y + 1, &row->chars[editorState.cursor_x], row->length - editorState.cursor_x);
 
-        //Update the new row
-        row = &E.row[E.cy];
-        row->size = E.cx;
-        row->chars[row->size] = '\0';
+        //Update the new rows
+        row = &editorState.rows[editorState.cursor_y];
+        row->length = editorState.cursor_x;
+        row->chars[row->length] = '\0';
 
         updateRow(row);
 
-        int cx_backup = E.cx;
-        int cy_backup = E.cy;
+        int cx_backup = editorState.cursor_x;
+        int cy_backup = editorState.cursor_y;
 
-        E.cy++;
+        editorState.cursor_y++;
 
         //Indent the next line, when we typed braces
-        for (int i = 0; i < E.indentNewLine; i++) {
+        for (int i = 0; i < editorState.indent_newline; i++) {
             insertChar('\t');
         }
 
-        E.cx = cx_backup;
-        E.cy = cy_backup;
+        editorState.cursor_x = cx_backup;
+        editorState.cursor_y = cy_backup;
     }
-    E.cy++;
-    E.cx = 0;
+    editorState.cursor_y++;
+    editorState.cursor_x = 0;
 }
 
 char *prompt(char *string, void (*callback)(char *, int)) {
@@ -75,8 +75,8 @@ char *prompt(char *string, void (*callback)(char *, int)) {
     size_t buflen = 0;
     buf[0] = '\0';
 
-    if (E.vimEmulation) {
-        VIM.mode |= VIM_PROMPT_MODE;
+    if (editorState.vim_emulation) {
+        vimState.mode |= VIM_PROMPT_MODE;
     }
 
     while(1) {
@@ -101,9 +101,9 @@ char *prompt(char *string, void (*callback)(char *, int)) {
             free(buf);
 
             //Exit vim prompt mode
-            if (E.vimEmulation) {
-                VIM.mode ^= VIM_PROMPT_MODE;
-                VIM.mode ^= VIM_SEARCH_MODE;
+            if (editorState.vim_emulation) {
+                vimState.mode ^= VIM_PROMPT_MODE;
+                vimState.mode ^= VIM_SEARCH_MODE;
             }
 
             return NULL;
@@ -117,8 +117,8 @@ char *prompt(char *string, void (*callback)(char *, int)) {
                 }
 
                 //Exit vim prompt mode
-                if (E.vimEmulation) {
-                    VIM.mode ^= VIM_PROMPT_MODE;
+                if (editorState.vim_emulation) {
+                    vimState.mode ^= VIM_PROMPT_MODE;
                 }
 
                 return buf;
@@ -141,14 +141,14 @@ char *prompt(char *string, void (*callback)(char *, int)) {
 }
 
 void find() {
-    int saved_cx = E.cx;
-    int saved_cy = E.cy;
-    int saved_coloff = E.coloff;
-    int saved_rowoff = E.rowoff;
+    int saved_cx = editorState.cursor_x;
+    int saved_cy = editorState.cursor_y;
+    int saved_coloff = editorState.coloff;
+    int saved_rowoff = editorState.rowoff;
 
 
     char *query;
-    if (E.vimEmulation) {
+    if (editorState.vim_emulation) {
         query = prompt("/%s", findCallback);
     } else {
         query = prompt("(ESC to cancel) Find: %s", findCallback);
@@ -157,14 +157,14 @@ void find() {
     if (query) {
         free(query);
     } else {
-        E.cx = saved_cx;
-        E.cy = saved_cy;
-        E.coloff = saved_coloff;
-        E.rowoff = saved_rowoff;
+        editorState.cursor_x = saved_cx;
+        editorState.cursor_y = saved_cy;
+        editorState.coloff = saved_coloff;
+        editorState.rowoff = saved_rowoff;
     }
 
-    if (VIM.mode & VIM_SEARCH_MODE) {
-        VIM.mode ^= VIM_SEARCH_MODE;
+    if (vimState.mode & VIM_SEARCH_MODE) {
+        vimState.mode ^= VIM_SEARCH_MODE;
     }
 }
 
@@ -176,7 +176,7 @@ void findCallback(char *query, int key) {
     static char *saved_hl = NULL;
 
     if (saved_hl) {
-        memcpy(E.row[saved_hl_line].hl, saved_hl, E.row[saved_hl_line].rsize);
+        memcpy(editorState.rows[saved_hl_line].highlight_types, saved_hl, editorState.rows[saved_hl_line].render_length);
         free(saved_hl);
         saved_hl = NULL;
     }
@@ -200,31 +200,31 @@ void findCallback(char *query, int key) {
 
     int current = last_match;
 
-    for (int i = 0; i < E.numrows; i++) {
+    for (int i = 0; i < editorState.numrows; i++) {
         current += direction;
         if (current == -1) {
-            current = E.numrows - 1;
-        } else if (current == E.numrows) {
+            current = editorState.numrows - 1;
+        } else if (current == editorState.numrows) {
             current = 0;
         }
 
-        erow *row = &E.row[current];
+        erow *row = &editorState.rows[current];
 
         char *match = strstr(row->render, query);
 
         if (match) {
             last_match = current;
-            E.cy = current;
-            E.cx = rowRxToCx(row, match - row->render);
-            E.rowoff = E.numrows;
+            editorState.cursor_y = current;
+            editorState.cursor_x = rowRxToCx(row, match - row->render);
+            editorState.rowoff = editorState.numrows;
 
             //Save all highlightings of the search query
             saved_hl_line = current;
-            saved_hl = malloc(row->rsize);
-            memcpy(saved_hl, row->hl, row->rsize);
+            saved_hl = malloc(row->render_length);
+            memcpy(saved_hl, row->highlight_types, row->render_length);
 
             //Set the color to HL_MATCH
-            memset(&row->hl[match - row->render], HL_MATCH, strlen(query));
+            memset(&row->highlight_types[match - row->render], HL_MATCH, strlen(query));
 
             break;
         }
@@ -240,5 +240,5 @@ void quit() {
 }
 
 void goToLine(int line) {
-    E.cy = line - 1;
+    editorState.cursor_y = line - 1;
 }

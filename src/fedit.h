@@ -28,85 +28,111 @@
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
 
-#define HL_HIGHLIGHT_NUMBERS (1<<0)
-#define HL_HIGHLIGHT_STRINGS (1<<1)
-#define HL_HIGHLIGHT_LTGT (1<<2)
-#define HL_HIGHLIGHT_TEMPLATES (1<<3)
-#define HL_HIGHLIGHT_PERCENT_FORMAT_SP (1<<4)
-
-#define VIM_INSERT_MODE (1<<0)
-#define VIM_PROMPT_MODE (1<<1)
-#define VIM_SEARCH_MODE (1<<2)
-#define VIM_DELETE_MODE (1<<3)
-#define VIM_GOTO_MODE	(1<<4)
-
-//Editor row
+///Abstract representation of a rows in the editor
 typedef struct erow {
+    ///Rows index in the whole file
     int idx;
-    int size;
-    int rsize;
+    ///Character length of the row
+    int length;
+    ///Length of the rendered contents meant to be displayed
+    int render_length;
+    ///Raw sequence of the line contents
     char *chars;
+    ///Raw sequence of the rendered contents
     char *render;
-    unsigned char *hl;
+    ///Syntax highlighting type per character
+    unsigned char *highlight_types;
+    ///This line is part of a comment
     int hl_open_comment;
 } erow;
 
-
-struct editorConfig {
-    //Cursor position
-    int cx, cy;
-    int rx;
+///The current editors state
+struct editorState {
+    ///Cursor x and y position in the file
+    int cursor_x, cursor_y;
+    ///Cursor rendered x position (Influenced by tabs and enabled line numbers)
+    int cursor_rendered_x;
+    ///The current rows offset on the screen (The rows the cursor is in)
     int rowoff;
+    ///The current columns offset on the screen (The column the cursor is in)
     int coloff;
+    ///Number of rows on screen
     int screenrows;
+    ///Number of columns (Terminal length)
     int screencols;
+    ///Number of rows (Terminal length)
     int numrows;
+    ///Disable syntax highlighting
     int disable_highlight;
-    erow *row;
+    ///Disable line numbering
+    int disable_linenums;
+    ///Text rows representing the contents of the opened file
+    erow *rows;
+    ///Whether the file was modified
     int modified;
-    int indentNewLine;
-    int vimEmulation;
+    ///Indent the next new line with n-tabs
+    int indent_newline;
+    ///Enable the vim emulation mode
+    int vim_emulation;
+    ///The path to the opened file as given by the user
     char *filepath;
+    ///The discrete file name
     char *filename;
+    ///Contents of the status message bar
     char statusmsg[80];
+    ///The message bar display timeout
     time_t statusmsg_time;
+    ///The syntax highlighting currently in use
     struct editorSyntax *syntax;
+    ///The original termios before the editor was drawn (terminal mode info)
     struct termios orig_termios;
 };
 
+///Syntax highlighting
 struct editorSyntax {
-    char *filetype;
+    ///Syntax name as displayed in the editor
+    char *pretty_name;
+    ///The shortform of the syntax when used for setting the syntax manually
     char *syntaxname;
+    ///All file extensions this syntax will be used for by default (including period prefix)
     char **filematch;
+    ///Contains all the keywords of the syntax that will be colored (suffixes "|" and "<" change the color)
     char **keywords;
+    ///Single line comment initiator string eg. //
     char *singleline_comment_start;
+    ///Multi line comment initiator string eg. /*
     char *multiline_comment_start;
+    ///Multi line comment end string eg. */
     char *multiline_comment_end;
+    ///Features / Additional options for the syntax highlighting. Found in enum `highlightFlags`
     int flags;
 };
 
-//Screen buffer
-struct abuf {
+///Contains all characters that will be sent to the terminal
+struct screen_buffer {
+    ///The actual string buffer of the buffer
     char *str_buf;
+    ///The length of the buffer
     int len;
 };
 
-typedef struct textChange {
-    int c;
-    int changetype;
-    int x, y;
-} textChange;
-
-typedef struct vimConfig {
+///Additional state when in vim mode
+struct vimState {
+    ///The current vim mode. enum `vimModes` contains all modes
     int mode;
-    int delwordsSize;
-    char *delwords;
-    textChange *allchanges;
-} vimConfig;
+    ///Buffer for number input before entering delete or goto mode
+    ///When user wants to delete next n words or goto line n, this buffer contains this number as a string
+    char *numinput_buffer;
+    ///The length of the numinput buffer
+    int numinput_buffer_len;
+};
 
-struct editorConfig E;
-vimConfig VIM;
+///Current mutable editorState
+struct editorState editorState;
+///Current mutable vimState
+struct vimState vimState;
 
+///Special keys used in the editor
 enum editorKey {
     BACKSPACE = 127,
     ARROW_LEFT 	= 1000,
@@ -121,6 +147,7 @@ enum editorKey {
 
 };
 
+///Categories of syntax highlighting
 enum editorHighlight {
     HL_NORMAL = 0,
     HL_STRING,
@@ -134,15 +161,28 @@ enum editorHighlight {
     HL_TEMPLATE_FORMAT,
 };
 
-enum editorChange {
-    LINE_DELETE = 0,
-    LINE_ADD,
-    CHAR_DELETE,
-    CHAR_ADD
+///Features of syntax highlighting
+enum highlightFlags {
+    HL_HIGHLIGHT_NUMBERS = 1,
+    HL_HIGHLIGHT_STRINGS = 2,
+    HL_HIGHLIGHT_LTGT = 4,
+    HL_HIGHLIGHT_TEMPLATES = 8,
+    HL_HIGHLIGHT_PERCENT_FORMAT_SP = 16
 };
 
+///Vim operation modes
+enum vimModes {
+    VIM_INSERT_MODE = 1,
+    VIM_PROMPT_MODE = 2,
+    VIM_SEARCH_MODE = 4,
+    VIM_DELETE_MODE = 8,
+    VIM_GOTO_MODE = 16
+};
+
+///Welcome message buffer
 char welcome[80];
-char *openfile;
+///File name of the file to be read. When given via cmdline argument
+char *cmdline_openfile;
 
 //Prototypes for fedit.c
 void init();
@@ -165,17 +205,18 @@ void handleSigWinch(int);
 
 //Prototypes for terminal.c
 void refreshScreen();
-void drawRows(struct abuf *ab);
+void drawRows(struct screen_buffer *ab);
 void scroll();
-void drawStatusBar(struct abuf *);
-void drawMessageBar(struct abuf *);
+void drawStatusBar(struct screen_buffer *);
+void drawMessageBar(struct screen_buffer *);
 int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);
 void updateWindowSize();
+uint countDigits(uint);
 
 //Prototyped for appendbuffer.c
-void abAppend(struct abuf *, const char *, int);
-void abFree(struct abuf *);
+void abAppend(struct screen_buffer *, const char *, int);
+void abFree(struct screen_buffer *);
 
 
 //Prototypes for file.c

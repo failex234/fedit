@@ -4,7 +4,7 @@
 void refreshScreen() {
     scroll();
 
-    struct abuf ab = ABUF_INIT;
+    struct screen_buffer ab = ABUF_INIT;
 
     //Hide the cursor so no "flickering" can occur (Set Mode)
     abAppend(&ab, "\x1b[?25l", 6);
@@ -17,7 +17,7 @@ void refreshScreen() {
 
     //Place the cursor to the position from the config
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (editorState.cursor_y - editorState.rowoff) + 1, (editorState.cursor_rendered_x - editorState.coloff) + 1);
     abAppend(&ab, buf, strlen(buf));
 
     //Show the cursor again (Reset Mode)
@@ -28,23 +28,23 @@ void refreshScreen() {
     abFree(&ab);
 }
 
-void drawRows(struct abuf *ab) {
+void drawRows(struct screen_buffer *ab) {
     //Place a tilde at the beginning of every line
-    for (int i = 0; i < E.screenrows; i++) {
-        int filerow = i + E.rowoff;
-        if (filerow >= E.numrows) {
+    for (int i = 0; i < editorState.screenrows; i++) {
+        int filerow = i + editorState.rowoff;
+        if (filerow >= editorState.numrows) {
             //Display welcome message
-            if (E.numrows == 0 && i == E.screenrows / 3) {
+            if (editorState.numrows == 0 && i == editorState.screenrows / 3) {
                 int welcomelen = snprintf(welcome, sizeof(welcome),
                                           "FEdit -- version %s", FEDIT_VERSION);
 
                 //Truncate the welcome message if longer than the number of columns
-                if (welcomelen > E.screencols) {
-                    welcomelen = E.screencols;
+                if (welcomelen > editorState.screencols) {
+                    welcomelen = editorState.screencols;
                 }
 
                 //Calculate padding to center the welcome message
-                int padding = (E.screencols - welcomelen) / 2;
+                int padding = (editorState.screencols - welcomelen) / 2;
                 if (padding) {
                     abAppend(ab, "~", 1);
                     padding--;
@@ -62,22 +62,41 @@ void drawRows(struct abuf *ab) {
                 abAppend(ab, "~", 1);
             }
         } else {
-            int len = E.row[filerow].rsize - E.coloff;
+            //Add line number to the beginning
+            if (!editorState.disable_linenums) {
+                uint linenum = filerow + 1;
+
+                uint max_digitcount = countDigits(editorState.numrows);
+                uint line_digitcount = countDigits(linenum);
+
+                char *line_prefix = (char*) malloc(max_digitcount + 1);
+
+                sprintf(line_prefix, "%d", linenum);
+
+                for (uint j = line_digitcount; j < max_digitcount; j++) {
+                    line_prefix[j] = ' ';
+                }
+                line_prefix[max_digitcount] = ' ';
+
+                abAppend(ab, line_prefix, max_digitcount + 1);
+            }
+
+            int len = editorState.rows[filerow].render_length - editorState.coloff;
             if (len < 0) len = 0;
-            if (len > E.screencols) len = E.screencols;
+            if (len > editorState.screencols) len = editorState.screencols;
 
             //Character of the line
-            char *c = &E.row[filerow].render[E.coloff];
+            char *c = &editorState.rows[filerow].render[editorState.coloff];
 
             //The characters' corresponding highlight
-            unsigned char *hl = &E.row[filerow].hl[E.coloff];
+            unsigned char *hl = &editorState.rows[filerow].highlight_types[editorState.coloff];
 
             int current_color = -1;
 
             //Get the color of each highlight and print
             //the corresponding escape sequence with it
             for (int i = 0; i < len; i++) {
-                unsigned char hl_curr = E.disable_highlight ? HL_NORMAL : hl[i];
+                unsigned char hl_curr = editorState.disable_highlight ? HL_NORMAL : hl[i];
                 if (iscntrl(c[i])) {
                     char sym = (c[i] <= 26) ? '@' + c[i] : '?';
                     abAppend(ab, "\x1b[7m", 4);
@@ -119,7 +138,7 @@ void drawRows(struct abuf *ab) {
     }
 }
 
-//Use ioctl with TIOCGWINSZ to get the current terminal size
+//Use ioctl with TIOCGWINSZ to get the current terminal length
 //If ioctl fails, set the cursor position the the bottom right (999, 999)
 //And get the position of the cursor to determine rows and columns
 int getWindowSize(int *rows, int *cols) {
@@ -174,49 +193,49 @@ int getCursorPosition(int *rows, int *cols) {
 }
 
 void scroll() {
-    E.rx = 0;
+    editorState.cursor_rendered_x = 0;
 
-    if (E.cy < E.numrows) {
-        E.rx = rowCxToRx(&E.row[E.cy], E.cx);
+    if (editorState.cursor_y < editorState.numrows) {
+        editorState.cursor_rendered_x = rowCxToRx(&editorState.rows[editorState.cursor_y], editorState.cursor_x);
     }
 
-    //When cursor is above the row offset
-    if (E.cy < E.rowoff) {
-        E.rowoff = E.cy;
+    //When cursor is above the rows offset
+    if (editorState.cursor_y < editorState.rowoff) {
+        editorState.rowoff = editorState.cursor_y;
     }
 
     //When cursor goes "offscreen" down
-    if (E.cy >= E.rowoff + E.screenrows) {
-        E.rowoff = E.cy - E.screenrows + 1;
+    if (editorState.cursor_y >= editorState.rowoff + editorState.screenrows) {
+        editorState.rowoff = editorState.cursor_y - editorState.screenrows + 1;
     }
 
     //When cursor is left of the column offset
-    if (E.rx < E.coloff) {
-        E.coloff = E.rx;
+    if (editorState.cursor_rendered_x < editorState.coloff) {
+        editorState.coloff = editorState.cursor_rendered_x;
     }
 
     //When cursor goes offscreen to the right
-    if (E.rx >= E.coloff + E.screencols) {
-        E.coloff = E.rx - E.screencols + 1;
+    if (editorState.cursor_rendered_x >= editorState.coloff + editorState.screencols) {
+        editorState.coloff = editorState.cursor_rendered_x - editorState.screencols + 1;
     }
 }
 
-void drawStatusBar(struct abuf *ab) {
+void drawStatusBar(struct screen_buffer *ab) {
     //Invert colors (Select Graphic Rendition)
     abAppend(ab, "\x1b[7m", 4);
     char status[80], rstatus[80];
 
-    int len = snprintf(status, sizeof(status), "%s %.20s - %d line%s", E.modified ? "(modified)" : "", E.filename ? E.filename : "[No Name]", E.numrows, E.numrows == 1 ? "" : "s");
-    int rlen = snprintf(rstatus, sizeof(rstatus), "(%s) %d/%d - %d", E.syntax ? E.syntax->filetype : "Plain Text", E.cy + 1 > E.numrows ? E.cy : E.cy + 1, E.numrows, E.cx + 1);
+    int len = snprintf(status, sizeof(status), "%s %.20s - %d line%s", editorState.modified ? "(modified)" : "", editorState.filename ? editorState.filename : "[No Name]", editorState.numrows, editorState.numrows == 1 ? "" : "s");
+    int rlen = snprintf(rstatus, sizeof(rstatus), "(%s) %d/%d - %d", editorState.syntax ? editorState.syntax->pretty_name : "Plain Text", editorState.cursor_y + 1 > editorState.numrows ? editorState.cursor_y : editorState.cursor_y + 1, editorState.numrows, editorState.cursor_x + 1);
 
-    if (len > E.screencols) {
-        len = E.screencols;
+    if (len > editorState.screencols) {
+        len = editorState.screencols;
     }
 
     abAppend(ab, status, len);
 
-    while (len < E.screencols) {
-        if (E.screencols - len == rlen) {
+    while (len < editorState.screencols) {
+        if (editorState.screencols - len == rlen) {
             abAppend(ab, rstatus, rlen);
             break;
         } else {
@@ -229,22 +248,32 @@ void drawStatusBar(struct abuf *ab) {
     abAppend(ab, "\r\n", 2);
 }
 
-void drawMessageBar(struct abuf *ab) {
+void drawMessageBar(struct screen_buffer *ab) {
     abAppend(ab, "\x1b[K", 3);
 
-    int msglen = strlen(E.statusmsg);
+    int msglen = strlen(editorState.statusmsg);
 
-    if (msglen > E.screencols) {
-        msglen = E.screencols;
+    if (msglen > editorState.screencols) {
+        msglen = editorState.screencols;
     }
-    if (msglen && time(NULL) - E.statusmsg_time < 5) {
-        abAppend(ab, E.statusmsg, msglen);
+    if (msglen && time(NULL) - editorState.statusmsg_time < 5) {
+        abAppend(ab, editorState.statusmsg, msglen);
     }
 }
 
 void updateWindowSize() {
-    if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
+    if (getWindowSize(&editorState.screenrows, &editorState.screencols) == -1) {
         die("getWindowsSize");
     }
-    E.screenrows -= 2;
+    editorState.screenrows -= 2;
+}
+
+uint countDigits(uint num) {
+    uint count = 0;
+
+    while (num > 0) {
+        num /= 10;
+        count++;
+    }
+    return count;
 }

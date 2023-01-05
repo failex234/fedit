@@ -2,9 +2,9 @@
 
 void addToDeleteWords(char numAsChar) {
     if (!isdigit(numAsChar)) return;
-    VIM.delwords = realloc(VIM.delwords, ++VIM.delwordsSize + 1);
-    VIM.delwords[VIM.delwordsSize - 1] = numAsChar;
-    VIM.delwords[VIM.delwordsSize] = '\0';
+    vimState.numinput_buffer = realloc(vimState.numinput_buffer, ++vimState.numinput_buffer_len + 1);
+    vimState.numinput_buffer[vimState.numinput_buffer_len - 1] = numAsChar;
+    vimState.numinput_buffer[vimState.numinput_buffer_len] = '\0';
 }
 
 
@@ -15,21 +15,21 @@ void deleteNWords(int number) {
     int endidx = 0;
     int i = 0;
 
-    if (E.cy > E.numrows || E.numrows == 0) {
+    if (editorState.cursor_y > editorState.numrows || editorState.numrows == 0) {
         return;
     }
 
-    char *currRow = E.row[E.cy].chars;
-    int rowSize = E.row[E.cy].size;
+    char *currRow = editorState.rows[editorState.cursor_y].chars;
+    int rowSize = editorState.rows[editorState.cursor_y].length;
 
     //Find the last space before the word
-    for (i = 0; i < E.cx; i++) {
+    for (i = 0; i < editorState.cursor_x; i++) {
         if (currRow[i] == ' ') {
             startidx = i;
         }
     }
 
-    if (E.cx) {
+    if (editorState.cursor_x) {
         i = ++startidx;
     } else {
         startidx = 0;
@@ -52,9 +52,9 @@ void deleteNWords(int number) {
 
     newrow[startidx + rowSize - endidx - 1] = '\0';
 
-    deleteRow(E.cy);
-    insertRow(E.cy, newrow, startidx + rowSize - endidx - 1);
+    deleteRow(editorState.cursor_y);
+    insertRow(editorState.cursor_y, newrow, startidx + rowSize - endidx - 1);
 
-    if (E.cx > E.row[E.cy].size) E.cx = E.row[E.cy].size - 1;
+    if (editorState.cursor_x > editorState.rows[editorState.cursor_y].length) editorState.cursor_x = editorState.rows[editorState.cursor_y].length - 1;
 
 }

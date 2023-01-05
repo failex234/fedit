@@ -13,7 +13,7 @@ void parseCommandLine(char *command) {
             }
             file_save();
         } else if (!strcmp(cmdonly, "q")) {
-            if (E.modified && !hasForceFlag) {
+            if (editorState.modified && !hasForceFlag) {
                 setStatusMessage(0, "Warning! File has unsaved changed");
             } else {
                 quit();
@@ -127,6 +127,22 @@ void parseCommandLine(char *command) {
                 }
             } else {
                 setStatusMessage(0, "Usage: syntax <on|off|<syntaxname>>");
+            }
+        } else if (!strcmp(cmdonly, "num")) {
+            if (argument) {
+                int enable_nums = !strcmp(argument, "on");
+                if (enable_nums && !editorState.disable_linenums) {
+                    setStatusMessage(0, "Line numbers already enabled!");
+                } else if (!enable_nums && editorState.disable_linenums) {
+                    setStatusMessage(0, "Line numbers already disabled!");
+                } else {
+                    editorState.disable_linenums = !enable_nums;
+                    refreshScreen();
+                    if (enable_nums) setStatusMessage(0, "Line numbers enabled!");
+                    else setStatusMessage(0, "Line numbers disabled!");
+                }
+            } else {
+                setStatusMessage(0, "Usage: num <on|off>");
             }
         } else {
             setStatusMessage(0, "Command not recognized");

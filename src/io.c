@@ -56,7 +56,7 @@ int readKey() {
             }
         }
         return '\x1b';
-    } else if (E.vimEmulation && !(VIM.mode & VIM_INSERT_MODE) && !(VIM.mode & VIM_PROMPT_MODE) && (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
+    } else if (editorState.vim_emulation && !(vimState.mode & VIM_INSERT_MODE) && !(vimState.mode & VIM_PROMPT_MODE) && (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
         switch(c) {
             case 'h':
                 return ARROW_LEFT;
@@ -77,13 +77,13 @@ void processKeyPress() {
 
     int c = readKey();
 
-    if (!E.vimEmulation) {
+    if (!editorState.vim_emulation) {
         switch(c) {
             case '\r':
                 insertNewLine();
                 break;
             case CTRL_KEY('q'):
-                if (E.modified && quit_times > 0) {
+                if (editorState.modified && quit_times > 0) {
                     setStatusMessage(0, "Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.", quit_times, quit_times > 1 ? "s" : "");
                     quit_times--;
                     return;
@@ -97,12 +97,12 @@ void processKeyPress() {
                 find();
                 break;
             case HOME_KEY:
-                E.cx = 0;
+                editorState.cursor_x = 0;
                 break;
             case END_KEY:
                 //Place the cursor at the end of the line
-                if (E.cy < E.numrows) {
-                    E.cx = E.row[E.cy].size;
+                if (editorState.cursor_y < editorState.numrows) {
+                    editorState.cursor_x = editorState.rows[editorState.cursor_y].length;
                 }
                 break;
             case BACKSPACE:
@@ -129,26 +129,26 @@ void processKeyPress() {
                 break;
             }
             case CTRL_KEY('l'):
-                deleteRow(E.cy);
+                deleteRow(editorState.cursor_y);
                 break;
             case PAGE_UP:
             case PAGE_DOWN:
             {
                 if (c == PAGE_UP) {
-                    E.cy = E.rowoff;
+                    editorState.cursor_y = editorState.rowoff;
 
-                    int times = E.screenrows;
+                    int times = editorState.screenrows;
                     while(times--) {
                         moveCursor(ARROW_UP);
                     }
                 } else if (c == PAGE_DOWN) {
-                    E.cy = E.rowoff + E.screenrows - 1;
+                    editorState.cursor_y = editorState.rowoff + editorState.screenrows - 1;
 
-                    if (E.cy > E.numrows) {
-                        E.cy = E.numrows;
+                    if (editorState.cursor_y > editorState.numrows) {
+                        editorState.cursor_y = editorState.numrows;
                     }
 
-                    int times = E.screenrows;
+                    int times = editorState.screenrows;
                     while(times--) {
                         moveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
                     }
@@ -168,7 +168,7 @@ void processKeyPress() {
                 break;
         }
         quit_times = FEDIT_QUIT_TIMES;
-    } else if (!(VIM.mode & VIM_DELETE_MODE)) {
+    } else if (!(vimState.mode & VIM_DELETE_MODE)) {
         switch(c) {
             case '0':
             case '1':
@@ -180,7 +180,7 @@ void processKeyPress() {
             case '7':
             case '8':
             case '9':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
                     addToDeleteWords(c);
@@ -188,17 +188,18 @@ void processKeyPress() {
                 }
                 break;
             case 'G':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
-                    if (VIM.delwords) {
-                        int num = atoi(VIM.delwords);
-                        if (num > E.numrows) num = E.numrows;
+                    if (vimState.numinput_buffer) {
+                        int num = atoi(vimState.numinput_buffer);
+                        if (num > editorState.numrows) num = editorState.numrows;
+                        if (num <= 0) num = 1;
 
                         goToLine(num);
-                        free(VIM.delwords);
-                        VIM.delwordsSize = 0;
-                        VIM.delwords = NULL;
+                        free(vimState.numinput_buffer);
+                        vimState.numinput_buffer_len = 0;
+                        vimState.numinput_buffer = NULL;
                         setStatusMessage(0, "");
                     } else {
                         goToLine(1);
@@ -206,53 +207,53 @@ void processKeyPress() {
                 }
                 break;
             case 'g':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
-                    if (VIM.mode & VIM_GOTO_MODE) {
-                        goToLine(E.numrows);
-                        VIM.mode = 0;
+                    if (vimState.mode & VIM_GOTO_MODE) {
+                        goToLine(editorState.numrows);
+                        vimState.mode = 0;
                     } else {
-                        VIM.mode = VIM_GOTO_MODE;
+                        vimState.mode = VIM_GOTO_MODE;
                     }
                 }
                 break;
             case 'i':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
                     setStatusMessage(-1, "--- INSERT ---");
-                    VIM.mode = VIM_INSERT_MODE;
+                    vimState.mode = VIM_INSERT_MODE;
                 }
                 break;
             case 'o':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
-                    if (E.cy < E.numrows) {
-                        E.cx = E.row[E.cy].size;
+                    if (editorState.cursor_y < editorState.numrows) {
+                        editorState.cursor_x = editorState.rows[editorState.cursor_y].length;
                     }
 
                     insertNewLine();
 
                     setStatusMessage(-1, "--- INSERT ---");
-                    VIM.mode = VIM_INSERT_MODE;
+                    vimState.mode = VIM_INSERT_MODE;
                 }
                 break;
             case 'd':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
-                    VIM.mode |= VIM_DELETE_MODE;
+                    vimState.mode |= VIM_DELETE_MODE;
                     setStatusMessage(-1, "--- DELETE ---");
                 }
                 break;
             case '\x1b':
-                VIM.mode = 0;
+                vimState.mode = 0;
                 setStatusMessage(0, "");
                 break;
             case ':':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
                     char *cmd = prompt(":%s", NULL);
@@ -265,17 +266,17 @@ void processKeyPress() {
                 }
                 break;
             case '/':
-                if (VIM.mode == 0) {
-                    VIM.mode = VIM_SEARCH_MODE;
+                if (vimState.mode == 0) {
+                    vimState.mode = VIM_SEARCH_MODE;
                     find();
-                } else if (VIM.mode & VIM_INSERT_MODE) {
+                } else if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 }
                 break;
             case BACKSPACE:
             case CTRL_KEY('h'):
             case DEL_KEY:
-                if (VIM.mode & VIM_INSERT_MODE || c == DEL_KEY) {
+                if (vimState.mode & VIM_INSERT_MODE || c == DEL_KEY) {
                     if (c == DEL_KEY) {
                         moveCursor(ARROW_RIGHT);
                     }
@@ -283,16 +284,16 @@ void processKeyPress() {
                 }
                 break;
             case HOME_KEY:
-                E.cx = 0;
+                editorState.cursor_x = 0;
                 break;
             case END_KEY:
                 //Place the cursor at the end of the line
-                if (E.cy < E.numrows) {
-                    E.cx = E.row[E.cy].size;
+                if (editorState.cursor_y < editorState.numrows) {
+                    editorState.cursor_x = editorState.rows[editorState.cursor_y].length;
                 }
                 break;
             case '\r':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertNewLine();
                 }
                 break;
@@ -309,20 +310,20 @@ void processKeyPress() {
             case PAGE_DOWN:
             {
                 if (c == PAGE_UP) {
-                    E.cy = E.rowoff;
+                    editorState.cursor_y = editorState.rowoff;
 
-                    int times = E.screenrows;
+                    int times = editorState.screenrows;
                     while(times--) {
                         moveCursor(ARROW_UP);
                     }
                 } else if (c == PAGE_DOWN) {
-                    E.cy = E.rowoff + E.screenrows - 1;
+                    editorState.cursor_y = editorState.rowoff + editorState.screenrows - 1;
 
-                    if (E.cy > E.numrows) {
-                        E.cy = E.numrows;
+                    if (editorState.cursor_y > editorState.numrows) {
+                        editorState.cursor_y = editorState.numrows;
                     }
 
-                    int times = E.screenrows;
+                    int times = editorState.screenrows;
                     while(times--) {
                         moveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
                     }
@@ -330,7 +331,7 @@ void processKeyPress() {
                 break;
             }
             case 'x':
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 } else {
                     moveCursor(ARROW_RIGHT);
@@ -339,45 +340,45 @@ void processKeyPress() {
                 break;
             default:
                 if (iscntrl(c)) break;
-                if (VIM.mode & VIM_INSERT_MODE) {
+                if (vimState.mode & VIM_INSERT_MODE) {
                     insertChar(c);
                 }
                 break;
         }
-    } else if (VIM.mode & VIM_DELETE_MODE) {
+    } else if (vimState.mode & VIM_DELETE_MODE) {
         switch (c)
         {
             case '\x1b':
-                VIM.mode = 0;
+                vimState.mode = 0;
                 setStatusMessage(0, "");
 
-                if (VIM.delwords) {
-                    free(VIM.delwords);
-                    VIM.delwordsSize = 0;
+                if (vimState.numinput_buffer) {
+                    free(vimState.numinput_buffer);
+                    vimState.numinput_buffer_len = 0;
                 }
                 break;
             case 'd':
-                if (VIM.delwords) {
-                    deleteNWords(atoi(VIM.delwords));
-                    free(VIM.delwords);
-                    VIM.delwordsSize = 0;
-                    VIM.delwords = NULL;
+                if (vimState.numinput_buffer) {
+                    deleteNWords(atoi(vimState.numinput_buffer));
+                    free(vimState.numinput_buffer);
+                    vimState.numinput_buffer_len = 0;
+                    vimState.numinput_buffer = NULL;
                 } else {
-                    deleteRow(E.cy);
+                    deleteRow(editorState.cursor_y);
                 }
-                VIM.mode = 0;
+                vimState.mode = 0;
                 setStatusMessage(0, "");
                 break;
             case 'e':
-                if (VIM.delwords) {
-                    deleteNWords(atoi(VIM.delwords));
-                    free(VIM.delwords);
-                    VIM.delwordsSize = 0;
-                    VIM.delwords = NULL;
+                if (vimState.numinput_buffer) {
+                    deleteNWords(atoi(vimState.numinput_buffer));
+                    free(vimState.numinput_buffer);
+                    vimState.numinput_buffer_len = 0;
+                    vimState.numinput_buffer = NULL;
                 } else {
                     deleteNWords(1);
                 }
-                VIM.mode = 0;
+                vimState.mode = 0;
                 setStatusMessage(0, "");
                 break;
             default:
@@ -396,8 +397,8 @@ void handleSigWinch(int signal) {
 
     updateWindowSize();
 
-    if (E.cy > E.screenrows) E.cy = E.screenrows - 1;
-    if (E.cx > E.screencols) E.cx = E.screencols - 1;
+    if (editorState.cursor_y > editorState.screenrows) editorState.cursor_y = editorState.screenrows - 1;
+    if (editorState.cursor_x > editorState.screencols) editorState.cursor_x = editorState.screencols - 1;
 
     refreshScreen();
 }

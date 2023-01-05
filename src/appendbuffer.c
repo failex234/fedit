@@ -1,6 +1,6 @@
 #include "fedit.h"
 
-void abAppend(struct abuf *ab, const char *s, int len) {
+void abAppend(struct screen_buffer *ab, const char *s, int len) {
     //Reallocate memory for the new string that should get appended
     char *new = realloc(ab->str_buf, ab->len + len);
     if (new == NULL) return;
@@ -12,6 +12,6 @@ void abAppend(struct abuf *ab, const char *s, int len) {
     ab->str_buf = new;
     ab->len += len;
 }
-void abFree(struct abuf *ab) {
+void abFree(struct screen_buffer *ab) {
     free(ab->str_buf);
 }
