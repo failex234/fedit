@@ -4,7 +4,7 @@ void file_open(char *filename) {
     //TODO: replaced
     set_file(strdup(filename));
 
-    selectSyntaxHighlight();
+    determineSyntaxHighlight();
 
     FILE *fp = fopen(filename, "r");
 
@@ -65,7 +65,7 @@ int file_save() {
             setStatusMessage(0, "Save aborted!");
             return 0;
         }
-        selectSyntaxHighlight();
+        determineSyntaxHighlight();
     }
 
     int len;
@@ -81,7 +81,7 @@ int file_save() {
                 E.modified = 0;
                 setStatusMessage(0, "%d bytes written to disk!", len);
 
-                selectSyntaxHighlight();
+                determineSyntaxHighlight();
                 return 1;
             }
         }

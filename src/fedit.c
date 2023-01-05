@@ -1,5 +1,6 @@
 #include "fedit.h"
 #include "config.h"
+#include "git.h"
 
 int main(int argc, char **argv) {
     int enableVim = 0;
@@ -57,6 +58,7 @@ void init() {
     E.rowoff = 0;
     E.coloff = 0;
     E.numrows = 0;
+    E.disable_highlight = 0;
     E.row = NULL;
     E.modified = 0;
     E.filepath = NULL;
@@ -144,5 +146,12 @@ void showHelp(const char *prgname) {
 }
 
 void showVersion(const char *prgname) {
-    printf("%s version %s (%s)\n", prgname, FEDIT_VERSION, FEDIT_COMPILE_DATE);
+#ifdef ENABLE_DEV
+    char *commit_hash = (char*) malloc(sizeof(char)*7);
+    memcpy(commit_hash, git_CommitSHA1(), 6);
+    commit_hash[6] = '\0';
+    printf("%s development version (compiled on %s)\nCommit Hash: %s\nUncommitted Changes: %s\n", prgname, FEDIT_COMPILE_DATE, commit_hash, git_AnyUncommittedChanges() ? "YES" : "NO");
+#else
+    printf("%s version %s (compiled on %s)\n", prgname, FEDIT_VERSION, FEDIT_COMPILE_DATE);
+#endif
 }

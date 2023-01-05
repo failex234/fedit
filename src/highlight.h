@@ -161,6 +161,7 @@ char *KOT_HL_keywords[] = {
 struct editorSyntax HLDB[] = {
         {
                 "C/C++",
+                "c",
                 C_HL_extensions,
                 C_HL_keywords,
                 "//", "/*", "*/",
@@ -168,6 +169,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "C#",
+                "c#",
                 CS_HL_extension,
                 CS_HL_keywords,
                 "//", "/*", "*/",
@@ -175,6 +177,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "Java",
+                "java",
                 JAVA_HL_extensions,
                 JAVA_HL_keywords,
                 "//", "/*", "*/",
@@ -182,6 +185,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "JavaScript",
+                "javascript",
                 JAVASCRIPT_HL_extensions,
                 JAVASCIRPT_HL_keywords,
                 "//", "/*", "*/",
@@ -189,6 +193,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "PHP",
+                "php",
                 PHP_HL_extensions,
                 PHP_HL_keywords,
                 "//", "/*", "*/",
@@ -196,6 +201,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "Python",
+                "python",
                 PY_HL_extensions,
                 PY_HL_keywords,
                 "#", "\"\"\"", "\"\"\"",
@@ -203,6 +209,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "Visual Basic",
+                "vb",
                 VB_HL_extensions,
                 VB_HL_keywords,
                 "'", NULL, NULL,
@@ -210,6 +217,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "Bash",
+                "shell",
                 BASH_HL_extensions,
                 BASH_HL_keywords,
                 "#", NULL, NULL,
@@ -217,6 +225,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "Objective-C",
+                "objc",
                 OBJC_HL_extensions,
                 OBJC_HL_keywords,
                 "//", "/*", "*/",
@@ -224,6 +233,7 @@ struct editorSyntax HLDB[] = {
         },
         {
                 "Kotlin",
+                "kotlin",
                 KOT_HL_extensions,
                 KOT_HL_keywords,
                 "//", "/*", "*/",

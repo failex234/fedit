@@ -44,7 +44,7 @@ void parseCommandLine(char *command) {
             char c;
             unsigned int i = 3;
 
-            while((c = cmdonly[i]) != '/' && i < strlen(cmdonly)) {
+            while ((c = cmdonly[i]) != '/' && i < strlen(cmdonly)) {
                 i++;
             }
 
@@ -57,7 +57,7 @@ void parseCommandLine(char *command) {
             i++;
 
             //extract the "substitute string"
-            while((c = cmdonly[i]) != '/' && i < strlen(cmdonly)) {
+            while ((c = cmdonly[i]) != '/' && i < strlen(cmdonly)) {
                 i++;
             }
 
@@ -87,7 +87,7 @@ void parseCommandLine(char *command) {
             subst[substLen] = '\0';
 
             //extract the flags
-            if ((int)strlen(cmdonly) > findLen + substLen + 5) {
+            if ((int) strlen(cmdonly) > findLen + substLen + 5) {
                 i = findLen + substLen + 5;
 
                 while ((c = cmdonly[i]) != '\0') {
@@ -108,6 +108,26 @@ void parseCommandLine(char *command) {
 
             free(find);
             free(subst);
+        } else if (!strcmp(cmdonly, "syntax")) {
+            if (argument) {
+                if (!strcmp(argument, "off")) {
+                    setStatusMessage(0, "Syntax highlighting turned off");
+                    forceSyntaxHighlighting(1, NULL);
+                } else if (!strcmp(argument, "on")) {
+                    setStatusMessage(0, "Syntax highlighting turned on");
+                    forceSyntaxHighlighting(0, NULL);
+                } else {
+                    struct editorSyntax *matchedSyntax = findSyntax(argument);
+                    if (matchedSyntax != NULL) {
+                        forceSyntaxHighlighting(0, matchedSyntax);
+                        setStatusMessage(0, "Syntax highlighting set to %s", argument);
+                    } else {
+                        setStatusMessage(0, "Syntax name not found");
+                    }
+                }
+            } else {
+                setStatusMessage(0, "Usage: syntax <on|off|<syntaxname>>");
+            }
         } else {
             setStatusMessage(0, "Command not recognized");
         }

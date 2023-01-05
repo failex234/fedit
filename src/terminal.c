@@ -77,6 +77,7 @@ void drawRows(struct abuf *ab) {
             //Get the color of each highlight and print
             //the corresponding escape sequence with it
             for (int i = 0; i < len; i++) {
+                unsigned char hl_curr = E.disable_highlight ? HL_NORMAL : hl[i];
                 if (iscntrl(c[i])) {
                     char sym = (c[i] <= 26) ? '@' + c[i] : '?';
                     abAppend(ab, "\x1b[7m", 4);
@@ -89,14 +90,14 @@ void drawRows(struct abuf *ab) {
                         int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", current_color);
                         abAppend(ab, buf, clen);
                     }
-                } else if (hl[i] == HL_NORMAL) {
+                } else if (hl_curr == HL_NORMAL) {
                     if (current_color != -1) {
                         abAppend(ab, "\x1b[39m", 5);
                         current_color = -1;
                     }
                     abAppend(ab, &c[i], 1);
                 } else {
-                    int color = syntaxToColor(hl[i]);
+                    int color = syntaxToColor(hl_curr);
                     if (color != current_color) {
                         current_color = color;
                         char buf[16];

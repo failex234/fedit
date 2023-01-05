@@ -23,7 +23,7 @@
 #define ABUF_INIT {NULL, 0}
 #define UNUSED(x) (void)(x)
 
-#define FEDIT_VERSION "0.0.2"
+#define FEDIT_VERSION "0.0.3"
 #define FEDIT_COMPILE_DATE __DATE__
 #define FEDIT_TAB_STOP 8
 #define FEDIT_QUIT_TIMES 2
@@ -61,6 +61,7 @@ struct editorConfig {
     int screenrows;
     int screencols;
     int numrows;
+    int disable_highlight;
     erow *row;
     int modified;
     int indentNewLine;
@@ -75,6 +76,7 @@ struct editorConfig {
 
 struct editorSyntax {
     char *filetype;
+    char *syntaxname;
     char **filematch;
     char **keywords;
     char *singleline_comment_start;
@@ -206,9 +208,11 @@ void goToLine(int);
 //Prototypes for highlight.c
 void updateSyntax(erow *);
 int syntaxToColor(int);
-void selectSyntaxHighlight();
+void determineSyntaxHighlight();
+void forceSyntaxHighlighting(int, struct editorSyntax*);
 int is_seperator(int);
 int is_format_seperator(int);
+struct editorSyntax *findSyntax(const char *);
 
 //Prototypes for commands.c
 void parseCommandLine(char *);

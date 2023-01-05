@@ -217,7 +217,7 @@ int syntaxToColor(int hl) {
     }
 }
 
-void selectSyntaxHighlight() {
+void determineSyntaxHighlight() {
     E.syntax = NULL;
 
     //Don't bother if no file is open
@@ -226,7 +226,7 @@ void selectSyntaxHighlight() {
     }
 
     //Get the file extension
-    char *ext = strchr(E.filename, '.');
+    char *ext = strrchr(E.filename, '.');
 
     for (unsigned int j = 0; j < HLDB_ENTRIES; j++) {
         //Get the syntax name
@@ -240,15 +240,28 @@ void selectSyntaxHighlight() {
             if ((is_ext && ext && !strcmp(ext, s->filematch[i])) || (!is_ext && strstr(E.filename, s->filematch[i]))) {
                 E.syntax = s;
 
-                int filerow;
-
-                for (filerow = 0; filerow < E.numrows; filerow++) {
+                for (int filerow = 0; filerow < E.numrows; filerow++) {
                     updateSyntax(&E.row[filerow]);
                 }
 
                 return;
             }
             i++;
+        }
+    }
+}
+
+void forceSyntaxHighlighting(int disable, struct editorSyntax *syntaxHighlighting) {
+    if (disable && syntaxHighlighting == NULL) {
+        E.disable_highlight = 1;
+        refreshScreen();
+    } else if (!disable && syntaxHighlighting == NULL) {
+        E.disable_highlight = 0;
+        refreshScreen();
+    } else if (syntaxHighlighting != NULL){
+        E.syntax = syntaxHighlighting;
+        for (int filerow = 0; filerow < E.numrows; filerow++) {
+            updateSyntax(&E.row[filerow]);
         }
     }
 }
@@ -267,4 +280,12 @@ int is_format_seperator(int c) {
             c == '\0'   ||
             strchr(",()+-/*=~%<>[];:!?#\\", c) != NULL
     );
+}
+
+struct editorSyntax *findSyntax(const char *syntaxname) {
+    for (unsigned int j = 0; j < HLDB_ENTRIES; j++) {
+        struct editorSyntax *s = &HLDB[j];
+        if (!strcmp(s->syntaxname, syntaxname)) return s;
+    }
+    return NULL;
 }
