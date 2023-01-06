@@ -8,7 +8,9 @@ FetchContent_Declare(cmake_git_version_tracking
         )
 FetchContent_MakeAvailable(cmake_git_version_tracking)
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DENABLE_DEV")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DENABLE_DEV -fsanitize=address -no-pie -fno-PIE -rdynamic")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE")
 
 add_executable(fedit src/fedit.h src/commands.c src/config.h src/vim_delete.c src/editor.c src/error.c src/file.c src/highlighting.h src/rows.c src/terminal.c src/terminal_io.c src/highlighting.c src/fedit.c src/signal.c src/commands.h src/editor.h src/error.h src/file.h src/rows.h src/signal.h src/terminal.h src/terminal_io.h src/vim_delete.h)
 target_link_libraries(fedit cmake_git_version_tracking)
+target_link_libraries(fedit dl)

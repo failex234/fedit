@@ -107,6 +107,7 @@ void drawRows(struct screen_buffer *ab) {
                 line_prefix[max_digitcount] = ' ';
 
                 abAppend(ab, line_prefix, max_digitcount + 1);
+                free(line_prefix);
             }
 
             int len = editorState.rows[filerow].render_length - editorState.coloff;

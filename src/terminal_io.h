@@ -22,5 +22,6 @@ int readKey();
 void processKeyPress();
 void enableRawMode();
 void disableRawMode();
+void clear_screen();
 
 #endif /* terminal_io_h */

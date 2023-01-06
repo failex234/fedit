@@ -24,7 +24,7 @@ void parse_command_prompt(char *prompt) {
             if (editorState.modified && !hasForceFlag) {
                 setStatusMessage(0, "Warning! File has unsaved changed");
             } else {
-                quit();
+                quit(0);
             }
         } else if (!strcmp(cmdonly, "wq")) {
             if (argument) {
@@ -32,11 +32,11 @@ void parse_command_prompt(char *prompt) {
                 set_file(argument);
             }
             if (file_save()) {
-                quit();
+                quit(0);
             }
         } else if (!strcmp(cmdonly, "x")) {
             if (file_save()) {
-                quit();
+                quit(0);
             }
         } else if (!strcmp(cmdonly, "a")) {
             if (argument) {

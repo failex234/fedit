@@ -18,7 +18,7 @@ int readKey() {
     char c;
 
     //Read key from stdin
-    while((nread = read(STDOUT_FILENO, &c, 1)) != 1) {
+    while ((nread = read(STDOUT_FILENO, &c, 1)) != 1) {
         if (nread == -1 && errno != EAGAIN) {
             die("read");
         }
@@ -41,35 +41,51 @@ int readKey() {
                 }
 
                 if (seq[2] == '~') {
-                    switch(seq[1]) {
-                        case '1': return HOME_KEY;
-                        case '3': return DEL_KEY;
-                        case '4': return END_KEY;
-                        case '5': return PAGE_UP;
-                        case '6': return PAGE_DOWN;
-                        case '7': return HOME_KEY;
-                        case '8': return END_KEY;
+                    switch (seq[1]) {
+                        case '1':
+                            return HOME_KEY;
+                        case '3':
+                            return DEL_KEY;
+                        case '4':
+                            return END_KEY;
+                        case '5':
+                            return PAGE_UP;
+                        case '6':
+                            return PAGE_DOWN;
+                        case '7':
+                            return HOME_KEY;
+                        case '8':
+                            return END_KEY;
                     }
                 }
             } else {
                 switch (seq[1]) {
-                    case 'A': return ARROW_UP;
-                    case 'B': return ARROW_DOWN;
-                    case 'C': return ARROW_RIGHT;
-                    case 'D': return ARROW_LEFT;
-                    case 'H': return HOME_KEY;
-                    case 'F': return END_KEY;
+                    case 'A':
+                        return ARROW_UP;
+                    case 'B':
+                        return ARROW_DOWN;
+                    case 'C':
+                        return ARROW_RIGHT;
+                    case 'D':
+                        return ARROW_LEFT;
+                    case 'H':
+                        return HOME_KEY;
+                    case 'F':
+                        return END_KEY;
                 }
             }
         } else if (seq[0] == 'O') {
-            switch(seq[1]) {
-                case 'H': return HOME_KEY;
-                case 'F': return END_KEY;
+            switch (seq[1]) {
+                case 'H':
+                    return HOME_KEY;
+                case 'F':
+                    return END_KEY;
             }
         }
         return '\x1b';
-    } else if (editorState.vim_emulation && !(vimState.mode & VIM_INSERT_MODE) && !(vimState.mode & VIM_PROMPT_MODE) && (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
-        switch(c) {
+    } else if (editorState.vim_emulation && !(vimState.mode & VIM_INSERT_MODE) && !(vimState.mode & VIM_PROMPT_MODE) &&
+               (c == 'h' || c == 'j' || c == 'k' || c == 'l')) {
+        switch (c) {
             case 'h':
                 return ARROW_LEFT;
             case 'j':
@@ -90,17 +106,18 @@ void processKeyPress() {
     int c = readKey();
 
     if (!editorState.vim_emulation) {
-        switch(c) {
+        switch (c) {
             case '\r':
                 insertNewLine();
                 break;
             case CTRL_KEY('q'):
                 if (editorState.modified && quit_times > 0) {
-                    setStatusMessage(0, "Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.", quit_times, quit_times > 1 ? "s" : "");
+                    setStatusMessage(0, "Warning! Your file has unsaved changes! Press Ctrl+Q %d more time%s to quit.",
+                                     quit_times, quit_times > 1 ? "s" : "");
                     quit_times--;
                     return;
                 }
-                quit();
+                quit(0);
                 break;
             case CTRL_KEY('s'):
                 file_save();
@@ -125,8 +142,7 @@ void processKeyPress() {
                 }
                 deleteChar();
                 break;
-            case CTRL_KEY('d'):
-            {
+            case CTRL_KEY('d'): {
                 char *str_num = prompt("Delete next %s words", NULL);
 
                 if (str_num) {
@@ -144,13 +160,12 @@ void processKeyPress() {
                 deleteRow(editorState.cursor_y);
                 break;
             case PAGE_UP:
-            case PAGE_DOWN:
-            {
+            case PAGE_DOWN: {
                 if (c == PAGE_UP) {
                     editorState.cursor_y = editorState.rowoff;
 
                     int times = editorState.screenrows;
-                    while(times--) {
+                    while (times--) {
                         moveCursor(ARROW_UP);
                     }
                 } else if (c == PAGE_DOWN) {
@@ -161,7 +176,7 @@ void processKeyPress() {
                     }
 
                     int times = editorState.screenrows;
-                    while(times--) {
+                    while (times--) {
                         moveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
                     }
                 }
@@ -181,7 +196,7 @@ void processKeyPress() {
         }
         quit_times = FEDIT_QUIT_TIMES;
     } else if (!(vimState.mode & VIM_DELETE_MODE)) {
-        switch(c) {
+        switch (c) {
             case '0':
             case '1':
             case '2':
@@ -319,13 +334,12 @@ void processKeyPress() {
                 moveCursor(c);
                 break;
             case PAGE_UP:
-            case PAGE_DOWN:
-            {
+            case PAGE_DOWN: {
                 if (c == PAGE_UP) {
                     editorState.cursor_y = editorState.rowoff;
 
                     int times = editorState.screenrows;
-                    while(times--) {
+                    while (times--) {
                         moveCursor(ARROW_UP);
                     }
                 } else if (c == PAGE_DOWN) {
@@ -336,7 +350,7 @@ void processKeyPress() {
                     }
 
                     int times = editorState.screenrows;
-                    while(times--) {
+                    while (times--) {
                         moveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
                     }
                 }
@@ -358,8 +372,7 @@ void processKeyPress() {
                 break;
         }
     } else if (vimState.mode & VIM_DELETE_MODE) {
-        switch (c)
-        {
+        switch (c) {
             case '\x1b':
                 vimState.mode = 0;
                 setStatusMessage(0, "");
@@ -459,5 +472,12 @@ void disableRawMode() {
     if (tcsetattr(0, TCSAFLUSH, &editorState.orig_termios) == -1) {
         die("tcsetattr");
     }
+}
+
+void clear_screen() {
+    //Erase screen
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    //Place cursor to default (1,1) position
+    write(STDOUT_FILENO, "\x1b[H", 3);
 }
 

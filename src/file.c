@@ -68,7 +68,6 @@ char *rows_to_string(int *buflen) {
 int file_save() {
     //Check if a file is opened
     if (editorState.filepath == NULL) {
-        //TODO: replaced
         set_file(prompt("Save as: %s", NULL));
 
         //User aborted file naming process by pressing ESC
@@ -104,6 +103,7 @@ int file_save() {
 }
 
 void set_file(const char *filepath) {
+    if (filepath == NULL) return;
     int is_path = (strchr(filepath, '/') != NULL);
 
     editorState.filepath = (char*) filepath;

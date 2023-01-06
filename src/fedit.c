@@ -42,7 +42,7 @@ void init() {
         die("getWindowSize");
     }
 
-    signal(SIGWINCH, handle_SIGWINCH);
+    register_handlers();
 
     editorState.screenrows -= 2;
 }
@@ -61,6 +61,7 @@ void showVersion(const char *prgname) {
     memcpy(commit_hash, git_CommitSHA1(), 6);
     commit_hash[6] = '\0';
     printf("%s development version (compiled on %s)\nCommit Hash: %s%s\n", prgname, FEDIT_COMPILE_DATE, commit_hash, git_AnyUncommittedChanges() ? " + uncommitted changes" : "");
+    free(commit_hash);
 #else
     printf("%s version %s (compiled on %s)\n", prgname, FEDIT_VERSION, FEDIT_COMPILE_DATE);
 #endif

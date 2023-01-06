@@ -82,7 +82,7 @@ void find();
 void findCallback(char *, int);
 void moveCursor(int);
 void setStatusMessage(int, const char *, ...);
-void quit();
+void quit(int status);
 void goToLine(int);
 
 

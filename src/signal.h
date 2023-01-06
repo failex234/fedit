@@ -3,6 +3,6 @@
 
 #define UNUSED(x) (void)(x)
 
-void handle_SIGWINCH(int signal);
+void register_handlers();
 
 #endif /* handlers_h */
