@@ -261,8 +261,16 @@ void drawStatusBar(struct screen_buffer *ab) {
     abAppend(ab, "\x1b[7m", 4);
     char status[80], rstatus[80];
 
-    int len = snprintf(status, sizeof(status), "%s %.20s - %d line%s", editorState.modified ? "(modified)" : "", editorState.filename ? editorState.filename : "[No Name]", editorState.numrows, editorState.numrows == 1 ? "" : "s");
-    int rlen = snprintf(rstatus, sizeof(rstatus), "(%s) %d/%d - %d", editorState.syntax ? editorState.syntax->pretty_name : "Plain Text", editorState.cursor_y + 1 > editorState.numrows ? editorState.cursor_y : editorState.cursor_y + 1, editorState.numrows, editorState.cursor_x + 1);
+    int len = snprintf(status, sizeof(status), "%s %.20s - %d line%s",
+                       editorState.modified ? "(modified)" : "",
+                       editorState.filename ? editorState.filename : "[No Name]",
+                       editorState.numrows, editorState.numrows == 1 ? "" : "s");
+
+    int rlen = snprintf(rstatus, sizeof(rstatus), "[%s] %d/%d (%d%%)",
+                        editorState.syntax ? editorState.syntax->pretty_name : "Plain Text",
+                        editorState.cursor_y + 1 > editorState.numrows ? editorState.cursor_y : editorState.cursor_y + 1,
+                        editorState.numrows,
+                        (int)(((double) (editorState.cursor_y + 1 > editorState.numrows ? editorState.cursor_y : editorState.cursor_y + 1) / (double) editorState.numrows) * 100));
 
     if (len > editorState.screencols) {
         len = editorState.screencols;

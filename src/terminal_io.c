@@ -211,7 +211,7 @@ void processKeyPress() {
                     insertChar(c);
                 } else {
                     addToDeleteWords(c);
-                    setStatusMessage(0, "--- GOTO ---");
+                    setStatusMessage(0, "%s", vimState.numinput_buffer);
                 }
                 break;
             case 'G':
@@ -278,6 +278,12 @@ void processKeyPress() {
             case '\x1b':
                 vimState.mode = 0;
                 setStatusMessage(0, "");
+
+                if (vimState.numinput_buffer_len > 0) {
+                    free(vimState.numinput_buffer);
+                    vimState.numinput_buffer_len = 0;
+                    vimState.numinput_buffer = NULL;
+                }
                 break;
             case ':':
                 if (vimState.mode & VIM_INSERT_MODE) {
