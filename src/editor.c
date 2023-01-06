@@ -2,14 +2,33 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 
 #include "editor.h"
+#include "fedit.h"
 #include "highlighting.h"
 #include "rows.h"
 #include "terminal.h"
 #include "terminal_io.h"
+
+#define CURLY_STACK_MAX_SIZE 128
+
+int *curly_stack_base;
+int *curly_stack_top;
+
+int curly_last_pos = -1;
+
+int curly_stack_pop() {
+    if (curly_stack_top == curly_stack_base) return -1;
+    curly_stack_top--;
+    return *curly_stack_top;
+}
+
+void curly_stack_push(int pos) {
+    if (curly_stack_top - curly_stack_base == CURLY_STACK_MAX_SIZE) return;
+    *curly_stack_top = pos;
+    curly_stack_top++;
+}
 
 
 void insertChar(int c) {
@@ -18,13 +37,42 @@ void insertChar(int c) {
     }
 
     if (c == '{') {
-        editorState.indent_newline++;
-    } else if (c == '}' && editorState.indent_newline != 0) {
-        editorState.indent_newline--;
-    }
+        curly_stack_push(editorState.cursor_rendered_x);
+    } else if (c == '}') {
+        int curly_x_pos = curly_stack_pop();
 
-    rowInsertChar(&editorState.rows[editorState.cursor_y], editorState.cursor_x, c);
-    editorState.cursor_x++;
+        if (curly_x_pos > -1) {
+            int abs_tabs = curly_x_pos / FEDIT_TAB_STOP;
+            int abs_add_spaces = curly_x_pos - (abs_tabs * FEDIT_TAB_STOP) - get_line_prefix_len();
+
+            int cur_tabs = (editorState.cursor_rendered_x - get_line_prefix_len()) / FEDIT_TAB_STOP;
+            int cur_add_spaces = editorState.cursor_rendered_x - (cur_tabs * FEDIT_TAB_STOP) - get_line_prefix_len();
+
+            int char_diff = ((abs_tabs * FEDIT_TAB_STOP) + abs_add_spaces) - ((cur_tabs * FEDIT_TAB_STOP) + cur_add_spaces);
+
+            if (char_diff >= 0) {
+                //Cursors x-axis value is less than the last curly brace value
+                for (int i = 0; i < abs_tabs - cur_tabs; i++) {
+                    rowInsertChar(&editorState.rows[editorState.cursor_y], editorState.cursor_x++, '\t');
+                }
+
+                for (int i = 0; i < abs_add_spaces - cur_add_spaces; i++) {
+                    rowInsertChar(&editorState.rows[editorState.cursor_y], editorState.cursor_x++, ' ');
+                }
+            } else {
+                //Cursors x-axis is higher than the last curly brace value
+                int abs_diff = -char_diff;
+
+                int remove_tabs = abs_diff / FEDIT_TAB_STOP;
+                int remove_spaces = abs_diff - (remove_tabs * FEDIT_TAB_STOP) - 1;
+
+                for (int i = 0; i < remove_tabs + remove_spaces; i++) {
+                    deleteChar();
+                }
+            }
+        }
+    }
+    rowInsertChar(&editorState.rows[editorState.cursor_y], editorState.cursor_x++, c);
 }
 
 void deleteChar() {
@@ -68,16 +116,26 @@ void insertNewLine() {
 
         editorState.cursor_y++;
 
-        //Indent the next line, when we typed braces
-        for (int i = 0; i < editorState.indent_newline; i++) {
-            insertChar('\t');
-        }
-
         editorState.cursor_x = cx_backup;
         editorState.cursor_y = cy_backup;
     }
     editorState.cursor_y++;
     editorState.cursor_x = 0;
+
+    if (curly_stack_top != curly_stack_base) {
+        int curly_x_pos = *(curly_stack_top - 1);
+
+        int abs_tabs = curly_x_pos / FEDIT_TAB_STOP;
+        int abs_add_spaces = curly_x_pos % FEDIT_TAB_STOP;
+
+        for (int i = 0; i < abs_tabs + 1; i++) {
+            insertChar('\t');
+        }
+
+        for (int i = 0; i < abs_add_spaces - editorState.cursor_rendered_x; i++) {
+            insertChar(' ');
+        }
+    }
 }
 
 char *prompt(char *string, void (*callback)(char *, int)) {
@@ -305,4 +363,9 @@ void setStatusMessage(int timeout, const char *format, ...) {
     } else {
         editorState.statusmsg_time = time(NULL) + 36000;
     }
+}
+
+void editor_initialize_data() {
+    curly_stack_base = (int*) malloc(sizeof(int) * CURLY_STACK_MAX_SIZE);
+    curly_stack_top = curly_stack_base;
 }

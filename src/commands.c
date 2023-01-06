@@ -10,67 +10,65 @@
 
 void parse_command_prompt(char *prompt) {
     int hasForceFlag = find_force_flag(prompt);
-    char *cmdonly = get_command(prompt, hasForceFlag);
-    char *argument = getArgument(prompt);
+    char *command_name = get_command(prompt, hasForceFlag);
+    char *arguments = getArgument(prompt);
 
-    if (cmdonly) {
-        if (!strcmp(cmdonly, "w")) {
-            if (argument) {
-                //TODO: replaced
-                set_file(argument);
+    if (command_name) {
+        if (!strcmp(command_name, "w")) {
+            if (arguments) {
+                set_file(arguments);
             }
             file_save();
-        } else if (!strcmp(cmdonly, "q")) {
+        } else if (!strcmp(command_name, "q")) {
             if (editorState.modified && !hasForceFlag) {
                 setStatusMessage(0, "Warning! File has unsaved changed");
             } else {
                 quit(0);
             }
-        } else if (!strcmp(cmdonly, "wq")) {
-            if (argument) {
-                //TODO: replaced
-                set_file(argument);
+        } else if (!strcmp(command_name, "wq")) {
+            if (arguments) {
+                set_file(arguments);
             }
             if (file_save()) {
                 quit(0);
             }
-        } else if (!strcmp(cmdonly, "x")) {
+        } else if (!strcmp(command_name, "x")) {
             if (file_save()) {
                 quit(0);
             }
-        } else if (!strcmp(cmdonly, "a")) {
-            if (argument) {
-                setStatusMessage(0, "Argument: %s", argument);
+        } else if (!strcmp(command_name, "a")) {
+            if (arguments) {
+                setStatusMessage(0, "Argument: %s", arguments);
             } else {
-                setStatusMessage(0, "No argument given :(");
+                setStatusMessage(0, "No arguments given :(");
             }
-        } else if (!strcmp(cmdonly, "h")) {
+        } else if (!strcmp(command_name, "h")) {
             setStatusMessage(0, "w = (w)rite file, q = (q)uit, x = write and e(x)it");
-        } else if (strlen(cmdonly) > 4 && cmdonly[0] == '%' && cmdonly[1] == 's' && cmdonly[2] == '/') {
+        } else if (strlen(command_name) > 4 && command_name[0] == '%' && command_name[1] == 's' && command_name[2] == '/') {
 
             //extract the "find" string
             char c;
             unsigned int i = 3;
 
-            while ((c = cmdonly[i]) != '/' && i < strlen(cmdonly)) {
+            while ((c = command_name[i]) != '/' && i < strlen(command_name)) {
                 i++;
             }
 
             int findLen = i - 3;
             char *find = malloc(findLen + 1);
 
-            memcpy(find, cmdonly + 3, findLen);
+            memcpy(find, command_name + 3, findLen);
             find[findLen] = '\0';
 
             i++;
 
             //extract the "substitute string"
-            while ((c = cmdonly[i]) != '/' && i < strlen(cmdonly)) {
+            while ((c = command_name[i]) != '/' && i < strlen(command_name)) {
                 i++;
             }
 
-            //Check if argument is in the expected format / doesn't contain errors
-            if ((i - 1 == strlen(cmdonly) && cmdonly[i - 2] != '/') || count_chars(cmdonly, strlen(cmdonly), '/') < 3) {
+            //Check if arguments is in the expected format / doesn't contain errors
+            if ((i - 1 == strlen(command_name) && command_name[i - 2] != '/') || count_chars(command_name, strlen(command_name), '/') < 3) {
                 free(find);
                 setStatusMessage(5, "Missing subsitute string!");
 
@@ -80,7 +78,7 @@ void parse_command_prompt(char *prompt) {
                 setStatusMessage(5, "Find string cannot be empty!");
 
                 return;
-            } else if (count_chars(cmdonly, strlen(cmdonly), '/') > 3) {
+            } else if (count_chars(command_name, strlen(command_name), '/') > 3) {
                 //TODO Ignore escaped slashes
                 free(find);
                 setStatusMessage(5, "Invalid substitute syntax!");
@@ -91,21 +89,21 @@ void parse_command_prompt(char *prompt) {
             int substLen = i + 1 - findLen - 5;
             char *subst = malloc(substLen + 1);
 
-            memcpy(subst, cmdonly + findLen + 4, substLen);
+            memcpy(subst, command_name + findLen + 4, substLen);
             subst[substLen] = '\0';
 
             //extract the flags
-            if ((int) strlen(cmdonly) > findLen + substLen + 5) {
+            if ((int) strlen(command_name) > findLen + substLen + 5) {
                 i = findLen + substLen + 5;
 
-                while ((c = cmdonly[i]) != '\0') {
+                while ((c = command_name[i]) != '\0') {
                     i++;
                 }
 
-                int flagsLen = strlen(cmdonly) - findLen - substLen - 4;
+                int flagsLen = strlen(command_name) - findLen - substLen - 4;
                 char *flags = malloc(flagsLen + 1);
 
-                memcpy(flags, cmdonly + 4 + findLen + substLen + 1, flagsLen);
+                memcpy(flags, command_name + 4 + findLen + substLen + 1, flagsLen);
                 flags[flagsLen] = '\0';
 
                 setStatusMessage(0, "Find: \"%s\", Replace with: \"%s\", Flags: \"%s\"", find, subst, flags);
@@ -116,19 +114,19 @@ void parse_command_prompt(char *prompt) {
 
             free(find);
             free(subst);
-        } else if (!strcmp(cmdonly, "syntax")) {
-            if (argument) {
-                if (!strcmp(argument, "off")) {
+        } else if (!strcmp(command_name, "syntax")) {
+            if (arguments) {
+                if (!strcmp(arguments, "off")) {
                     setStatusMessage(0, "Syntax highlighting turned off");
                     forceSyntaxHighlighting(1, NULL);
-                } else if (!strcmp(argument, "on")) {
+                } else if (!strcmp(arguments, "on")) {
                     setStatusMessage(0, "Syntax highlighting turned on");
                     forceSyntaxHighlighting(0, NULL);
                 } else {
-                    struct editorSyntax *matchedSyntax = findSyntax(argument);
+                    struct editorSyntax *matchedSyntax = findSyntax(arguments);
                     if (matchedSyntax != NULL) {
                         forceSyntaxHighlighting(0, matchedSyntax);
-                        setStatusMessage(0, "Syntax highlighting set to %s", argument);
+                        setStatusMessage(0, "Syntax highlighting set to %s", arguments);
                     } else {
                         setStatusMessage(0, "Syntax name not found");
                     }
@@ -136,9 +134,9 @@ void parse_command_prompt(char *prompt) {
             } else {
                 setStatusMessage(0, "Usage: syntax <on|off|<syntaxname>>");
             }
-        } else if (!strcmp(cmdonly, "num")) {
-            if (argument) {
-                int enable_nums = !strcmp(argument, "on");
+        } else if (!strcmp(command_name, "num")) {
+            if (arguments) {
+                int enable_nums = !strcmp(arguments, "on");
                 if (enable_nums && !editorState.disable_linenums) {
                     setStatusMessage(0, "Line numbers already enabled!");
                 } else if (!enable_nums && editorState.disable_linenums) {
@@ -156,7 +154,10 @@ void parse_command_prompt(char *prompt) {
             setStatusMessage(0, "Command not recognized");
         }
 
+        free(command_name);
         free(prompt);
+
+        if (arguments) free(arguments);
     } else {
         setStatusMessage(0, "Command not recognized %s");
     }

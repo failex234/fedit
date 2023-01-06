@@ -31,7 +31,6 @@ void init() {
     editorState.statusmsg[0] = '\0';
     editorState.statusmsg_time = 0;
     editorState.syntax = NULL;
-    editorState.indent_newline = 0;
     editorState.vim_emulation = 0;
 
     vimState.mode = 0;
@@ -43,6 +42,7 @@ void init() {
     }
 
     register_handlers();
+    editor_initialize_data();
 
     editorState.screenrows -= 2;
 }

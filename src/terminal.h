@@ -5,6 +5,7 @@
 
 typedef unsigned int uint;
 
+
 ///Contains all characters that will be sent to the terminal
 struct screen_buffer {
     ///The actual string buffer of the buffer
@@ -24,6 +25,7 @@ int getWindowSize(int *, int *);
 int getCursorPosition(int *, int *);
 void updateWindowSize();
 uint countDigits(uint);
+uint get_line_prefix_len();
 
 
 #endif /* terminal_h */

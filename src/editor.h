@@ -28,8 +28,6 @@ struct editorState {
     struct erow *rows;
     ///Whether the file was modified
     int modified;
-    ///Indent the next new line with n-tabs
-    int indent_newline;
     ///Enable the vim emulation mode
     int vim_emulation;
     ///The path to the opened file as given by the user
@@ -84,6 +82,7 @@ void moveCursor(int);
 void setStatusMessage(int, const char *, ...);
 void quit(int status);
 void goToLine(int);
+void editor_initialize_data();
 
 
 #endif /* editor_h */
