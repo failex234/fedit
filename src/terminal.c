@@ -12,6 +12,8 @@
 #include "rows.h"
 #include "terminal.h"
 
+uint line_prefix_len = 0;
+
 void abAppend(struct screen_buffer *ab, const char *s, int len) {
     //Reallocate memory for the new string that should get appended
     char *new = realloc(ab->str_buf, ab->len + len);
@@ -97,6 +99,8 @@ void drawRows(struct screen_buffer *ab) {
                 uint max_digitcount = countDigits(editorState.numrows);
                 uint line_digitcount = countDigits(linenum);
 
+                line_prefix_len = max_digitcount + 1;
+
                 char *line_prefix = (char*) malloc(max_digitcount + 1);
 
                 sprintf(line_prefix, "%d", linenum);
@@ -106,7 +110,10 @@ void drawRows(struct screen_buffer *ab) {
                 }
                 line_prefix[max_digitcount] = ' ';
 
+                abAppend(ab, "\x1b[2m", 4);
                 abAppend(ab, line_prefix, max_digitcount + 1);
+                abAppend(ab, "\x1b[22m", 5);
+
                 free(line_prefix);
             }
 
@@ -305,4 +312,8 @@ uint countDigits(uint num) {
         count++;
     }
     return count;
+}
+
+uint get_line_prefix_len() {
+    return line_prefix_len;
 }
